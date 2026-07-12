@@ -1,13 +1,28 @@
 "use client";
 
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Input } from "antd";
-import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { Button, Checkbox, Input } from "antd";
+import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form";
 
 import type { ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
+
+function CurrentAwareEndDate({ index }: { index: number }) {
+  const { control } = useFormContext<ResumeContent>();
+  const isCurrent = useWatch({ control, name: `education.${index}.current` });
+
+  return (
+    <Controller
+      name={`education.${index}.endDate`}
+      control={control}
+      render={({ field }) => (
+        <Input {...field} disabled={isCurrent} placeholder="End (blank = present)" />
+      )}
+    />
+  );
+}
 
 export function EducationSection() {
   const { control } = useFormContext<ResumeContent>();
@@ -62,12 +77,17 @@ export function EducationSection() {
                   />
                 )}
               />
-              <Controller
-                name={`education.${index}.endDate`}
-                control={control}
-                render={({ field }) => <Input {...field} placeholder="End (blank = present)" />}
-              />
+              <CurrentAwareEndDate index={index} />
             </div>
+            <Controller
+              name={`education.${index}.current`}
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
+                  Currently studying here
+                </Checkbox>
+              )}
+            />
             <Controller
               name={`education.${index}.description`}
               control={control}
@@ -101,6 +121,7 @@ export function EducationSection() {
             fieldOfStudy: "",
             startDate: "",
             endDate: "",
+            current: false,
             description: "",
           })
         }

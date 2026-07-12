@@ -30,6 +30,7 @@ export const educationEntrySchema = z.object({
   fieldOfStudy: z.string().default(""),
   startDate: z.string().min(1, { error: "Start date is required" }),
   endDate: z.string().default(""),
+  current: z.boolean().default(false),
   description: z.string().default(""),
 });
 

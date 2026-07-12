@@ -72,7 +72,7 @@ export function ResumeDocument({ title, content }: { title: string; content: Res
       <Page size="A4" style={styles.page}>
         <Text style={styles.heading}>{title}</Text>
 
-        {content.summary ? (
+        {content.summary.trim() ? (
           <View>
             <Text style={styles.sectionTitle}>Summary</Text>
             <Text style={styles.paragraph}>{content.summary}</Text>
@@ -115,7 +115,7 @@ export function ResumeDocument({ title, content }: { title: string; content: Res
                     {entry.fieldOfStudy ? `, ${entry.fieldOfStudy}` : ""} · {entry.institution}
                   </Text>
                   <Text style={styles.entryMeta}>
-                    {formatRange(entry.startDate, entry.endDate, false)}
+                    {formatRange(entry.startDate, entry.endDate, entry.current)}
                   </Text>
                 </View>
                 {entry.description ? <Text style={styles.paragraph}>{entry.description}</Text> : null}

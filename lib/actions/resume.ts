@@ -15,6 +15,21 @@ export async function createResume(title: string): Promise<{ id: string }> {
   return { id: resume.id };
 }
 
+export async function saveTitle(resumeId: string, title: string): Promise<{ ok: boolean }> {
+  const trimmed = title.trim();
+  if (!trimmed) return { ok: false };
+
+  try {
+    const { count } = await prisma.resume.updateMany({
+      where: { id: resumeId, userId: DEMO_USER_ID, status: "DRAFT" },
+      data: { title: trimmed },
+    });
+    return { ok: count > 0 };
+  } catch {
+    return { ok: false };
+  }
+}
+
 export type SaveDraftResult = { ok: true; savedAt: string } | { ok: false; error: string };
 
 export async function saveDraft(resumeId: string, content: unknown): Promise<SaveDraftResult> {
