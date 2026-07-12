@@ -223,6 +223,12 @@ The serverless monolith deploys cleanly to a first-party Next.js host or a conta
 - **Database:** A managed serverless Postgres (Neon / Supabase / Vercel Postgres).
 - **CI/CD:** GitHub Actions → build, typecheck, `prisma migrate deploy`, deploy.
 
+### CI status (implemented)
+
+[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) runs on every push to `main` and every PR: install → lint → `tsc --noEmit` → Vitest → `next build`. On `main`, a second job runs `prisma migrate deploy` — it no-ops with a log message until a production `DATABASE_URL` secret is added under **Settings → Secrets and variables → Actions**.
+
+Not yet wired (deferred pending account/infra decisions): an actual deploy step (Vercel or Docker to Fly.io/Railway), a managed production Postgres, and Sentry error tracking.
+
 ---
 
 ## Documentation Index

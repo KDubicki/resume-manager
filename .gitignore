@@ -37,6 +37,9 @@ yarn-error.log*
 # pnpm local content-addressable store
 .pnpm-store/
 
+# Claude Code local session/tool state (permission cache, task locks)
+.claude/
+
 # vercel
 .vercel
 
