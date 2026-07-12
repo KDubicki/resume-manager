@@ -128,13 +128,25 @@ resume-manager/
 - **pnpm** ≥ 9 (or npm/yarn)
 - **PostgreSQL** ≥ 15 (local via Docker, or a managed instance)
 
-### Local Setup
+### Option A — Docker Compose (app + database, no local Node/pnpm needed)
+
+```bash
+docker compose up --build
+```
+
+This builds the app image (`Dockerfile`, `dev` target) and starts it alongside a
+`postgres:16-alpine` container (`docker-compose.yml`), with source bind-mounted for
+hot reload. The app is available at `http://localhost:3000`; Postgres is published on
+`localhost:5432` (defaults: `postgres` / `postgres` / `resume_manager`, overridable via
+`.env`, see `.env.example`).
+
+### Option B — Local Node/pnpm, database in Docker
 
 ```bash
 # 1. Install dependencies
 pnpm install
 
-# 2. Start a local database (Docker example)
+# 2. Start a local database
 docker run --name resume-db -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_DB=resume_manager -p 5432:5432 -d postgres:16
 
