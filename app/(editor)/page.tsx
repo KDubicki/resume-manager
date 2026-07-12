@@ -1,29 +1,51 @@
 "use client";
 
 import { Typography } from "antd";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { TopBar } from "@/components/app-shell/top-bar";
 import { WorkbenchShell } from "@/components/app-shell/workbench-shell";
 import { EmptyState } from "@/components/editor/empty-state";
-import { ResumeEditor } from "@/components/editor/resume-editor";
-import { defaultResumeContent, type ResumeContent } from "@/lib/schemas/resume";
+import { ResumeEditor, type ResumeEditorHandle, type SaveState } from "@/components/editor/resume-editor";
+import { createResume } from "@/lib/actions/resume";
+import { defaultResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./page.module.css";
 
 export default function EditorPage() {
-  const [title, setTitle] = useState("Senior Engineer CV");
-  const [content, setContent] = useState<ResumeContent | null>(null);
+  const [title, setTitle] = useState("Untitled resume");
+  const [resumeId, setResumeId] = useState<string | null>(null);
+  const [saveState, setSaveState] = useState<SaveState>({ status: "idle", lastSavedAt: null });
+  const editorRef = useRef<ResumeEditorHandle>(null);
 
-  if (!content) {
-    return <EmptyState onNewResume={() => setContent(defaultResumeContent)} />;
+  const handleNewResume = useCallback(() => {
+    void createResume(title).then(({ id }) => setResumeId(id));
+  }, [title]);
+
+  const handleSaveStateChange = useCallback((state: SaveState) => setSaveState(state), []);
+
+  if (!resumeId) {
+    return <EmptyState onNewResume={handleNewResume} />;
   }
 
   return (
     <div className={styles.page}>
-      <TopBar title={title} onTitleChange={setTitle} lastSavedAt={null} />
+      <TopBar
+        title={title}
+        onTitleChange={setTitle}
+        saveStatus={saveState.status}
+        lastSavedAt={saveState.lastSavedAt}
+        onRetrySave={() => editorRef.current?.retry()}
+      />
       <WorkbenchShell
-        editor={<ResumeEditor initialValues={content} />}
+        editor={
+          <ResumeEditor
+            ref={editorRef}
+            resumeId={resumeId}
+            initialValues={defaultResumeContent}
+            onSaveStateChange={handleSaveStateChange}
+          />
+        }
         preview={
           <div className={styles.previewStack}>
             <div className={styles.paper}>

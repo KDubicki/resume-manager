@@ -4,17 +4,21 @@ import { Button, Space, Typography } from "antd";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
-import { SaveIndicator } from "./save-indicator";
+import { SaveIndicator, type SaveStatus } from "./save-indicator";
 import styles from "./top-bar.module.css";
 
 export function TopBar({
   title,
   onTitleChange,
+  saveStatus,
   lastSavedAt,
+  onRetrySave,
 }: {
   title: string;
   onTitleChange: (title: string) => void;
+  saveStatus: SaveStatus;
   lastSavedAt: Date | null;
+  onRetrySave?: () => void;
 }) {
   return (
     <header className={styles.bar}>
@@ -30,7 +34,7 @@ export function TopBar({
         {title}
       </Typography.Title>
       <Space size="middle" className={styles.controls}>
-        <SaveIndicator lastSavedAt={lastSavedAt} />
+        <SaveIndicator status={saveStatus} lastSavedAt={lastSavedAt} onRetry={onRetrySave} />
         <ThemeToggle />
         <Button type="primary" disabled title="Export lands in a later step">
           Export PDF

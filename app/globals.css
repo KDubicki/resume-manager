@@ -7,6 +7,7 @@
      from lib/theme/tokens.ts so UI chrome stays legible in dark mode. */
   --surface: #ffffff;
   --surface-border: #d8ddda;
+  --error-ink: #b23a48;
 }
 
 :root[data-theme="dark"] {
@@ -15,6 +16,7 @@
   --workbench-bg: #0d1413;
   --surface: #151d1b;
   --surface-border: #2a3532;
+  --error-ink: #d3707a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,6 +26,7 @@
     --workbench-bg: #0d1413;
     --surface: #151d1b;
     --surface-border: #2a3532;
+    --error-ink: #d3707a;
   }
 }
 
