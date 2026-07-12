@@ -25,3 +25,15 @@
   align-items: center;
   justify-content: space-between;
 }
+
+/* antd's `danger` Button color for the `text` variant comes from a
+   dark-algorithm-derived shade of colorError, not the literal token value
+   we configure (lib/theme/tokens.ts) -- it measured 4.04:1 against the
+   4.5:1 AA floor in dark mode. Overriding the already-verified
+   --error-ink CSS variable directly sidesteps antd's internal derivation
+   entirely. */
+.removeButton,
+.removeButton:hover,
+.removeButton:focus {
+  color: var(--error-ink);
+}

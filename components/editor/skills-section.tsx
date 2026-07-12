@@ -19,6 +19,7 @@ export function SkillsSection() {
         render={({ field }) => (
           <Select
             mode="tags"
+            aria-label="Skills"
             style={{ width: "100%" }}
             value={field.value.map((skill) => skill.name)}
             onChange={(names: string[]) =>

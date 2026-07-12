@@ -8,6 +8,7 @@
   --surface: #ffffff;
   --surface-border: #d8ddda;
   --error-ink: #b23a48;
+  --focus-ring: #0f5c57;
 }
 
 :root[data-theme="dark"] {
@@ -17,6 +18,7 @@
   --surface: #151d1b;
   --surface-border: #2a3532;
   --error-ink: #d3707a;
+  --focus-ring: #39a99e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,6 +29,7 @@
     --surface: #151d1b;
     --surface-border: #2a3532;
     --error-ink: #d3707a;
+    --focus-ring: #39a99e;
   }
 }
 
@@ -68,6 +71,16 @@ a {
 .font-mono {
   font-family: var(--font-plex-mono), ui-monospace, monospace;
   letter-spacing: 0.02em;
+}
+
+/* a11y floor (frontend-design.md §9): every interactive element needs a
+   visible focus ring. antd's own components already show one via their
+   token-driven box-shadow; this is additive and is the ONLY focus
+   indicator for plain HTML elements we hand-roll (ATS Lens chip, the
+   "try again" retry link) that don't get antd's built-in treatment. */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

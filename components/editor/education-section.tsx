@@ -76,7 +76,12 @@ export function EducationSection() {
               )}
             />
             <div className={styles.entryFooter}>
-              <Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(index)}>
+              <Button
+                type="text"
+                className={styles.removeButton}
+                icon={<DeleteOutlined />}
+                onClick={() => remove(index)}
+              >
                 Remove
               </Button>
             </div>
