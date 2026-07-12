@@ -5,21 +5,25 @@ import { useState } from "react";
 
 import { TopBar } from "@/components/app-shell/top-bar";
 import { WorkbenchShell } from "@/components/app-shell/workbench-shell";
+import { EmptyState } from "@/components/editor/empty-state";
+import { ResumeEditor } from "@/components/editor/resume-editor";
+import { defaultResumeContent, type ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./page.module.css";
 
 export default function EditorPage() {
   const [title, setTitle] = useState("Senior Engineer CV");
+  const [content, setContent] = useState<ResumeContent | null>(null);
+
+  if (!content) {
+    return <EmptyState onNewResume={() => setContent(defaultResumeContent)} />;
+  }
 
   return (
     <div className={styles.page}>
       <TopBar title={title} onTitleChange={setTitle} lastSavedAt={null} />
       <WorkbenchShell
-        editor={
-          <Typography.Text type="secondary" className="font-mono">
-            The section editor (Summary, Experience, Education, Skills) arrives in Step 5.
-          </Typography.Text>
-        }
+        editor={<ResumeEditor initialValues={content} />}
         preview={
           <div className={styles.previewStack}>
             <div className={styles.paper}>

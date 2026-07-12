@@ -1,0 +1,107 @@
+"use client";
+
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Input } from "antd";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+
+import type { ResumeContent } from "@/lib/schemas/resume";
+
+import styles from "./list-section.module.css";
+import { SectionCard } from "./section-card";
+
+export function EducationSection() {
+  const { control } = useFormContext<ResumeContent>();
+  const { fields, append, remove } = useFieldArray({ control, name: "education" });
+
+  return (
+    <SectionCard
+      title="Education"
+      meta={`${fields.length} ${fields.length === 1 ? "entry" : "entries"}`}
+    >
+      <div className={styles.list}>
+        {fields.map((field, index) => (
+          <div key={field.id} className={styles.entry}>
+            <div className={styles.row}>
+              <Controller
+                name={`education.${index}.institution`}
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    {...field}
+                    placeholder="Institution"
+                    status={fieldState.error ? "error" : undefined}
+                  />
+                )}
+              />
+              <Controller
+                name={`education.${index}.degree`}
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    {...field}
+                    placeholder="Degree"
+                    status={fieldState.error ? "error" : undefined}
+                  />
+                )}
+              />
+              <Controller
+                name={`education.${index}.fieldOfStudy`}
+                control={control}
+                render={({ field }) => <Input {...field} placeholder="Field of study" />}
+              />
+            </div>
+            <div className={styles.row}>
+              <Controller
+                name={`education.${index}.startDate`}
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    {...field}
+                    placeholder="Start (e.g. 2015-09)"
+                    status={fieldState.error ? "error" : undefined}
+                  />
+                )}
+              />
+              <Controller
+                name={`education.${index}.endDate`}
+                control={control}
+                render={({ field }) => <Input {...field} placeholder="End (blank = present)" />}
+              />
+            </div>
+            <Controller
+              name={`education.${index}.description`}
+              control={control}
+              render={({ field }) => (
+                <Input.TextArea {...field} rows={2} placeholder="Notable coursework, honors, thesis…" />
+              )}
+            />
+            <div className={styles.entryFooter}>
+              <Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(index)}>
+                Remove
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Button
+        type="dashed"
+        block
+        icon={<PlusOutlined />}
+        style={{ marginTop: 16 }}
+        onClick={() =>
+          append({
+            id: crypto.randomUUID(),
+            institution: "",
+            degree: "",
+            fieldOfStudy: "",
+            startDate: "",
+            endDate: "",
+            description: "",
+          })
+        }
+      >
+        Add education
+      </Button>
+    </SectionCard>
+  );
+}
