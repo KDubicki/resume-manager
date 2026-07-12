@@ -4,7 +4,7 @@
 // (our Next.js scaffold's default). No-op once antd ships native v19 support.
 import "@ant-design/v5-patch-for-react-19";
 
-import { ConfigProvider } from "antd";
+import { App, ConfigProvider } from "antd";
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
 
 import { darkTheme, lightTheme } from "@/lib/theme/tokens";
@@ -102,7 +102,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeContext.Provider value={value}>
       <ConfigProvider theme={resolvedTheme === "dark" ? darkTheme : lightTheme}>
-        {children}
+        {/* Lets components use App.useApp() for message/notification/modal
+            that pick up the ConfigProvider theme, instead of the static
+            antd singletons (which don't). */}
+        <App>{children}</App>
       </ConfigProvider>
     </ThemeContext.Provider>
   );

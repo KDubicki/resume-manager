@@ -18,7 +18,7 @@ const AUTOSAVE_DELAY_MS = 4000;
 const PREVIEW_DELAY_MS = 400;
 
 export type SaveState = { status: SaveStatus; lastSavedAt: Date | null };
-export type ResumeEditorHandle = { retry: () => void };
+export type ResumeEditorHandle = { retry: () => Promise<void> };
 
 export const ResumeEditor = forwardRef<
   ResumeEditorHandle,
@@ -87,7 +87,7 @@ export const ResumeEditor = forwardRef<
     };
   }, [watch, flush]);
 
-  useImperativeHandle(ref, () => ({ retry: () => void flush(getValues()) }), [flush, getValues]);
+  useImperativeHandle(ref, () => ({ retry: () => flush(getValues()) }), [flush, getValues]);
 
   // RHF's `watch` callback never reports type "blur" for Controller-wrapped
   // fields (it's always "change"), so blur-triggered saving needs its own

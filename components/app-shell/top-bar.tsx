@@ -13,12 +13,16 @@ export function TopBar({
   saveStatus,
   lastSavedAt,
   onRetrySave,
+  onExport,
+  exporting,
 }: {
   title: string;
   onTitleChange: (title: string) => void;
   saveStatus: SaveStatus;
   lastSavedAt: Date | null;
   onRetrySave?: () => void;
+  onExport: () => void;
+  exporting: boolean;
 }) {
   return (
     <header className={styles.bar}>
@@ -36,7 +40,7 @@ export function TopBar({
       <Space size="middle" className={styles.controls}>
         <SaveIndicator status={saveStatus} lastSavedAt={lastSavedAt} onRetry={onRetrySave} />
         <ThemeToggle />
-        <Button type="primary" disabled title="Export lands in a later step">
+        <Button type="primary" loading={exporting} onClick={onExport}>
           Export PDF
         </Button>
       </Space>

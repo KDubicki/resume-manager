@@ -11,9 +11,13 @@ type Pane = "edit" | "preview";
 export function WorkbenchShell({
   editor,
   preview,
+  onExport,
+  exporting,
 }: {
   editor: React.ReactNode;
   preview: React.ReactNode;
+  onExport: () => void;
+  exporting: boolean;
 }) {
   const [activePane, setActivePane] = useState<Pane>("edit");
 
@@ -32,7 +36,7 @@ export function WorkbenchShell({
       </div>
       <div className={`${styles.pane} ${styles.editorPane}`}>{editor}</div>
       <div className={`${styles.pane} ${styles.previewPane}`}>{preview}</div>
-      <MobileExportBar />
+      <MobileExportBar onExport={onExport} exporting={exporting} />
     </div>
   );
 }
