@@ -1,12 +1,29 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --brass: #b07d2b;
+  --paper: #ffffff;
+  --workbench-bg: #eaedeb;
+  /* Chrome surface (top bar, mobile toggle/export bars) — unlike --paper,
+     this DOES follow the theme; it mirrors colorBgContainer/colorBorder
+     from lib/theme/tokens.ts so UI chrome stays legible in dark mode. */
+  --surface: #ffffff;
+  --surface-border: #d8ddda;
+}
+
+:root[data-theme="dark"] {
+  --brass: #d6a24c;
+  --paper: #f7f7f4;
+  --workbench-bg: #0d1413;
+  --surface: #151d1b;
+  --surface-border: #2a3532;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --brass: #d6a24c;
+    --paper: #f7f7f4;
+    --workbench-bg: #0d1413;
+    --surface: #151d1b;
+    --surface-border: #2a3532;
   }
 }
 
@@ -24,9 +41,8 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--workbench-bg);
+  font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -42,8 +58,22 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+.font-mono {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

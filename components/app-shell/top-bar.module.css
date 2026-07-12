@@ -1,0 +1,30 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--surface-border);
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-size: 22px;
+  line-height: 1;
+  color: var(--brass);
+}
+
+.title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.controls {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 575.98px) {
+  .bar {
+    padding: 10px 12px;
+  }
+}
