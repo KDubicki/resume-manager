@@ -239,4 +239,5 @@ Not yet wired (deferred pending account/infra decisions): an actual deploy step 
 | [prd/architecture.md](./prd/architecture.md) | Solution architecture, PDF pipeline, deployment topology. |
 | [prd/frontend-design.md](./prd/frontend-design.md) | UI design system: palette, light/dark mode, typography, responsive layout. |
 | [prd/implementation-plan.md](./prd/implementation-plan.md) | Dependency-ordered, stepped build plan for the MVP. |
+| [prd/hardening-plan.md](./prd/hardening-plan.md) | Stepped plan to fix the correctness/cleanup issues found by the post-MVP `/code-review ultra` pass. |
 | [prd/skills.md](./prd/skills.md) | Claude Code skills for the deployment lifecycle. |

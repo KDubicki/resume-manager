@@ -19,7 +19,11 @@ export default function EditorPage() {
   const { message } = App.useApp();
   const [title, setTitle] = useState("Untitled resume");
   const [resumeId, setResumeId] = useState<string | null>(null);
-  const [saveState, setSaveState] = useState<SaveState>({ status: "idle", lastSavedAt: null });
+  const [saveState, setSaveState] = useState<SaveState>({
+    status: "idle",
+    lastSavedAt: null,
+    error: null,
+  });
   const [previewContent, setPreviewContent] = useState<ResumeContent>(defaultResumeContent);
   const [exporting, setExporting] = useState(false);
   const editorRef = useRef<ResumeEditorHandle>(null);
@@ -36,8 +40,13 @@ export default function EditorPage() {
     try {
       // Flush any pending edit first: export streams the persisted DB
       // content, so exporting the instant after typing must not ship a
-      // stale draft.
-      await editorRef.current?.retry();
+      // stale draft. If that save genuinely failed, abort here instead of
+      // exporting a stale row while claiming success.
+      const saved = await editorRef.current?.retry();
+      if (saved === false) {
+        message.error("Couldn't save your latest changes — try again before exporting.");
+        return;
+      }
 
       const response = await fetch(`/api/export/${resumeId}`);
       if (!response.ok) throw new Error(`export failed with ${response.status}`);
@@ -75,7 +84,8 @@ export default function EditorPage() {
         onTitleChange={setTitle}
         saveStatus={saveState.status}
         lastSavedAt={saveState.lastSavedAt}
-        onRetrySave={() => editorRef.current?.retry()}
+        saveError={saveState.error}
+        onRetrySave={() => void editorRef.current?.retry()}
         onExport={() => void handleExport()}
         exporting={exporting}
       />

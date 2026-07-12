@@ -17,8 +17,8 @@ import { SummarySection } from "./summary-section";
 const AUTOSAVE_DELAY_MS = 4000;
 const PREVIEW_DELAY_MS = 400;
 
-export type SaveState = { status: SaveStatus; lastSavedAt: Date | null };
-export type ResumeEditorHandle = { retry: () => Promise<void> };
+export type SaveState = { status: SaveStatus; lastSavedAt: Date | null; error: string | null };
+export type ResumeEditorHandle = { retry: () => Promise<boolean> };
 
 export const ResumeEditor = forwardRef<
   ResumeEditorHandle,
@@ -42,26 +42,64 @@ export const ResumeEditor = forwardRef<
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const flush = useCallback(
-    async (values: ResumeContent) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+  // Serializes saveDraft calls so at most one is ever in flight: a second
+  // caller arriving mid-save (autosave timer, blur, and retry() can all
+  // fire close together) doesn't start an overlapping request that could
+  // resolve out of order and let a stale write clobber a newer one in the
+  // DB. Instead it flags a re-run, which always reads a *fresh* getValues()
+  // once the current attempt finishes, so the last write to actually land
+  // reflects whatever the form contains by then.
+  const inFlightPromiseRef = useRef<Promise<boolean> | null>(null);
+  const rerunRequestedRef = useRef(false);
+
+  const runFlush = useCallback(async (): Promise<boolean> => {
+    let lastOk = true;
+    do {
+      rerunRequestedRef.current = false;
       setSaveStatus("saving");
-      const result = await saveDraft(resumeId, values);
-      if (result.ok) {
-        setSaveStatus("saved");
-        setLastSavedAt(new Date(result.savedAt));
-      } else {
+      try {
+        const result = await saveDraft(resumeId, getValues());
+        if (result.ok) {
+          setSaveStatus("saved");
+          setLastSavedAt(new Date(result.savedAt));
+          setSaveError(null);
+          lastOk = true;
+        } else {
+          setSaveStatus("error");
+          setSaveError(result.error);
+          lastOk = false;
+        }
+      } catch {
+        // saveDraft itself catches DB-level failures, but the Server Action
+        // invocation can still fail before that (e.g. a network drop), so
+        // this is a second, outer safety net rather than a duplicate.
         setSaveStatus("error");
+        setSaveError("a network or server error occurred");
+        lastOk = false;
       }
-    },
-    [resumeId],
-  );
+    } while (rerunRequestedRef.current);
+    return lastOk;
+  }, [resumeId, getValues]);
+
+  const flush = useCallback((): Promise<boolean> => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    if (inFlightPromiseRef.current) {
+      rerunRequestedRef.current = true;
+      return inFlightPromiseRef.current;
+    }
+    const promise = runFlush().finally(() => {
+      inFlightPromiseRef.current = null;
+    });
+    inFlightPromiseRef.current = promise;
+    return promise;
+  }, [runFlush]);
 
   // Ref so the live-preview timer doesn't need to be re-scheduled on every
   // parent re-render (only a new *value* should reset it).
@@ -73,7 +111,7 @@ export const ResumeEditor = forwardRef<
   useEffect(() => {
     const subscription = watch((values) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => void flush(values as ResumeContent), AUTOSAVE_DELAY_MS);
+      timeoutRef.current = setTimeout(() => void flush(), AUTOSAVE_DELAY_MS);
 
       if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
       previewTimeoutRef.current = setTimeout(() => {
@@ -87,7 +125,7 @@ export const ResumeEditor = forwardRef<
     };
   }, [watch, flush]);
 
-  useImperativeHandle(ref, () => ({ retry: () => flush(getValues()) }), [flush, getValues]);
+  useImperativeHandle(ref, () => ({ retry: () => flush() }), [flush]);
 
   // RHF's `watch` callback never reports type "blur" for Controller-wrapped
   // fields (it's always "change"), so blur-triggered saving needs its own
@@ -98,19 +136,20 @@ export const ResumeEditor = forwardRef<
   const handleBlurCapture = useCallback(
     (event: React.FocusEvent<HTMLDivElement>) => {
       if (!event.currentTarget.contains(event.relatedTarget)) {
-        void flush(getValues());
+        void flush();
       }
     },
-    [flush, getValues],
+    [flush],
   );
 
-  // Ref so this effect only reacts to real status/lastSavedAt transitions,
-  // not to a new inline callback identity on every parent re-render.
+  // Ref so this effect only reacts to real status/lastSavedAt/error
+  // transitions, not to a new inline callback identity on every parent
+  // re-render.
   const onSaveStateChangeRef = useRef(onSaveStateChange);
   onSaveStateChangeRef.current = onSaveStateChange;
   useEffect(() => {
-    onSaveStateChangeRef.current?.({ status: saveStatus, lastSavedAt });
-  }, [saveStatus, lastSavedAt]);
+    onSaveStateChangeRef.current?.({ status: saveStatus, lastSavedAt, error: saveError });
+  }, [saveStatus, lastSavedAt, saveError]);
 
   return (
     <FormProvider {...methods}>

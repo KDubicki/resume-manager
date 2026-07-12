@@ -10,7 +10,17 @@ export const experienceEntrySchema = z.object({
   startDate: z.string().min(1, { error: "Start date is required" }),
   endDate: z.string().default(""),
   current: z.boolean().default(false),
-  highlights: z.array(z.string().min(1)).default([]),
+  // Not `.min(1)` per element: the editor's "one highlight per line" textarea
+  // naturally produces a blank line while the user is mid-typing a new
+  // bullet (e.g. right after pressing Enter), and a single invalid entry
+  // would previously fail validation for the WHOLE resume, silently
+  // blocking autosave. Blank/whitespace-only lines are dropped here instead
+  // of rejected, matching what resume-document.tsx already tolerates when
+  // rendering (`highlights.filter(Boolean)`).
+  highlights: z
+    .array(z.string())
+    .transform((lines) => lines.filter((line) => line.trim().length > 0))
+    .default([]),
 });
 
 export const educationEntrySchema = z.object({

@@ -89,6 +89,25 @@ describe("resumeContentSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("drops blank highlight lines instead of rejecting the entry", () => {
+    const result = resumeContentSchema.safeParse({
+      experience: [
+        {
+          company: "Acme",
+          role: "Eng",
+          startDate: "2020",
+          highlights: ["Led the migration", "", "   ", "Cut latency"],
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.success && result.data.experience[0]!.highlights).toEqual([
+      "Led the migration",
+      "Cut latency",
+    ]);
+  });
+
   it("rejects an education entry missing required fields", () => {
     const result = resumeContentSchema.safeParse({
       education: [{ degree: "B.Sc." }],

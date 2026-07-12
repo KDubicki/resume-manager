@@ -12,6 +12,7 @@ export function TopBar({
   onTitleChange,
   saveStatus,
   lastSavedAt,
+  saveError,
   onRetrySave,
   onExport,
   exporting,
@@ -20,6 +21,7 @@ export function TopBar({
   onTitleChange: (title: string) => void;
   saveStatus: SaveStatus;
   lastSavedAt: Date | null;
+  saveError?: string | null;
   onRetrySave?: () => void;
   onExport: () => void;
   exporting: boolean;
@@ -38,7 +40,12 @@ export function TopBar({
         {title}
       </Typography.Title>
       <Space size="middle" className={styles.controls}>
-        <SaveIndicator status={saveStatus} lastSavedAt={lastSavedAt} onRetry={onRetrySave} />
+        <SaveIndicator
+          status={saveStatus}
+          lastSavedAt={lastSavedAt}
+          error={saveError}
+          onRetry={onRetrySave}
+        />
         <ThemeToggle />
         <Button type="primary" loading={exporting} onClick={onExport}>
           Export PDF

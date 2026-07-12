@@ -11,10 +11,12 @@ function formatTime(date: Date): string {
 export function SaveIndicator({
   status,
   lastSavedAt,
+  error,
   onRetry,
 }: {
   status: SaveStatus;
   lastSavedAt: Date | null;
+  error?: string | null;
   onRetry?: () => void;
 }) {
   return (
@@ -30,7 +32,7 @@ export function SaveIndicator({
       )}
       {status === "error" && (
         <span className={styles.error}>
-          Couldn&apos;t save · your work isn&apos;t lost —{" "}
+          {`Couldn't save · ${error ?? "your work isn't lost"} —`}{" "}
           <button type="button" className={styles.retry} onClick={onRetry}>
             try again
           </button>
