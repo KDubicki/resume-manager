@@ -1,0 +1,70 @@
+.lens {
+  width: 100%;
+}
+
+.chip {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 12.5px;
+}
+
+.title {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 14px auto 1fr;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.label {
+  opacity: 0.7;
+}
+
+.value {
+  text-align: right;
+}
+
+.checkOk {
+  color: var(--brass);
+}
+
+.checkNeutral {
+  opacity: 0.4;
+}
+
+@media (max-width: 767.98px) {
+  .chip {
+    display: inline-flex;
+  }
+
+  .panel {
+    display: none;
+    margin-top: 8px;
+  }
+
+  .panel[data-expanded="true"] {
+    display: block;
+  }
+}

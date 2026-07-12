@@ -15,6 +15,7 @@ import { SkillsSection } from "./skills-section";
 import { SummarySection } from "./summary-section";
 
 const AUTOSAVE_DELAY_MS = 4000;
+const PREVIEW_DELAY_MS = 400;
 
 export type SaveState = { status: SaveStatus; lastSavedAt: Date | null };
 export type ResumeEditorHandle = { retry: () => void };
@@ -25,8 +26,9 @@ export const ResumeEditor = forwardRef<
     resumeId: string;
     initialValues: ResumeContent;
     onSaveStateChange?: (state: SaveState) => void;
+    onContentChange?: (content: ResumeContent) => void;
   }
->(function ResumeEditor({ resumeId, initialValues, onSaveStateChange }, ref) {
+>(function ResumeEditor({ resumeId, initialValues, onSaveStateChange, onContentChange }, ref) {
   const methods = useForm<ResumeContent>({
     // zodResolver infers the schema's *input* type (fields with .default()
     // are optional there), but every value that ever flows through this
@@ -41,6 +43,7 @@ export const ResumeEditor = forwardRef<
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const flush = useCallback(
     async (values: ResumeContent) => {
@@ -60,15 +63,27 @@ export const ResumeEditor = forwardRef<
     [resumeId],
   );
 
-  // Debounced (3-5s) autosave.
+  // Ref so the live-preview timer doesn't need to be re-scheduled on every
+  // parent re-render (only a new *value* should reset it).
+  const onContentChangeRef = useRef(onContentChange);
+  onContentChangeRef.current = onContentChange;
+
+  // Debounced (3-5s) autosave, plus a much shorter debounce driving the live
+  // preview so it feels responsive without re-rendering a PDF per keystroke.
   useEffect(() => {
     const subscription = watch((values) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => void flush(values as ResumeContent), AUTOSAVE_DELAY_MS);
+
+      if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
+      previewTimeoutRef.current = setTimeout(() => {
+        onContentChangeRef.current?.(values as ResumeContent);
+      }, PREVIEW_DELAY_MS);
     });
     return () => {
       subscription.unsubscribe();
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
     };
   }, [watch, flush]);
 
