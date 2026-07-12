@@ -1,5 +1,9 @@
 "use client";
 
+// antd v5 officially supports React 16-18; this patches it for React 19
+// (our Next.js scaffold's default). No-op once antd ships native v19 support.
+import "@ant-design/v5-patch-for-react-19";
+
 import { ConfigProvider } from "antd";
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
 
