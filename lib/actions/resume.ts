@@ -25,6 +25,29 @@ export async function createResume(
   return { id: resume.id };
 }
 
+export async function duplicateResume(
+  resumeId: string,
+): Promise<{ ok: true; id: string } | { ok: false }> {
+  try {
+    // Scoped by userId — a resume that isn't the user's can't be copied.
+    const source = await prisma.resume.findFirst({
+      where: { id: resumeId, userId: DEMO_USER_ID },
+      select: { title: true, content: true },
+    });
+    if (!source) return { ok: false };
+
+    // Re-validate through the shared schema so the copy is written in exactly
+    // the same shape the rest of the data layer guarantees.
+    const content = resumeContentSchema.parse(source.content);
+    const copy = await prisma.resume.create({
+      data: { userId: DEMO_USER_ID, title: `${source.title} (copy)`, content },
+    });
+    return { ok: true, id: copy.id };
+  } catch {
+    return { ok: false };
+  }
+}
+
 export async function deleteResume(resumeId: string): Promise<{ ok: boolean }> {
   try {
     // Scoped by userId, not just id — the same IDOR guard the rest of the data

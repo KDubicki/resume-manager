@@ -1,12 +1,12 @@
 "use client";
 
-import { DeleteOutlined } from "@ant-design/icons";
-import { App, Button, Popconfirm } from "antd";
+import { CopyOutlined, DeleteOutlined } from "@ant-design/icons";
+import { App, Button, Popconfirm, Tooltip } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { deleteResume } from "@/lib/actions/resume";
+import { deleteResume, duplicateResume } from "@/lib/actions/resume";
 
 import styles from "./resume-card.module.css";
 
@@ -24,6 +24,24 @@ export function ResumeCard({
   const router = useRouter();
   const { message } = App.useApp();
   const [deleting, setDeleting] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
+
+  const handleDuplicate = async () => {
+    setDuplicating(true);
+    try {
+      const result = await duplicateResume(id);
+      if (!result.ok) {
+        message.error("Couldn't duplicate that resume — try again.");
+        return;
+      }
+      message.success(`Duplicated "${title}"`);
+      router.refresh();
+    } catch {
+      message.error("Couldn't duplicate that resume — try again.");
+    } finally {
+      setDuplicating(false);
+    }
+  };
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -53,6 +71,16 @@ export function ResumeCard({
         <div className={styles.cardMeta}>Updated {updatedLabel}</div>
       </Link>
       <div className={styles.cardActions}>
+        <Tooltip title="Duplicate">
+          <Button
+            type="text"
+            size="small"
+            aria-label={`Duplicate ${title}`}
+            icon={<CopyOutlined />}
+            loading={duplicating}
+            onClick={handleDuplicate}
+          />
+        </Tooltip>
         <Popconfirm
           title="Delete this resume?"
           description="This can't be undone."
