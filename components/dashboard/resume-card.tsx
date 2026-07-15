@@ -1,12 +1,12 @@
 "use client";
 
-import { CopyOutlined, DeleteOutlined } from "@ant-design/icons";
-import { App, Button, Popconfirm, Tooltip } from "antd";
+import { CopyOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { App, Button, Input, Popconfirm, Tooltip } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { deleteResume, duplicateResume } from "@/lib/actions/resume";
+import { deleteResume, duplicateResume, saveTitle } from "@/lib/actions/resume";
 
 import styles from "./resume-card.module.css";
 
@@ -25,6 +25,71 @@ export function ResumeCard({
   const { message } = App.useApp();
   const [deleting, setDeleting] = useState(false);
   const [duplicating, setDuplicating] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draftTitle, setDraftTitle] = useState(title);
+  const [savingTitle, setSavingTitle] = useState(false);
+
+  const startEditing = () => {
+    setDraftTitle(title);
+    setEditing(true);
+  };
+
+  const handleRename = async () => {
+    const next = draftTitle.trim();
+    // Nothing to do for an empty or unchanged title — just leave edit mode.
+    if (!next || next === title) {
+      setEditing(false);
+      return;
+    }
+    setSavingTitle(true);
+    try {
+      const { ok } = await saveTitle(id, next);
+      if (!ok) {
+        message.error("Couldn't rename that resume — try again.");
+        return;
+      }
+      setEditing(false);
+      router.refresh();
+    } catch {
+      message.error("Couldn't rename that resume — try again.");
+    } finally {
+      setSavingTitle(false);
+    }
+  };
+
+  if (editing) {
+    return (
+      <div className={styles.card}>
+        <div className={styles.editBody}>
+          <span className={styles.badge}>{templateLabel}</span>
+          <Input
+            autoFocus
+            value={draftTitle}
+            aria-label="Resume title"
+            onChange={(e) => setDraftTitle(e.target.value)}
+            onPressEnter={() => void handleRename()}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setEditing(false);
+            }}
+            disabled={savingTitle}
+          />
+          <div className={styles.editActions}>
+            <Button
+              type="primary"
+              size="small"
+              loading={savingTitle}
+              onClick={() => void handleRename()}
+            >
+              Save
+            </Button>
+            <Button size="small" onClick={() => setEditing(false)} disabled={savingTitle}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleDuplicate = async () => {
     setDuplicating(true);
@@ -63,7 +128,7 @@ export function ResumeCard({
 
   return (
     <div className={styles.card}>
-      {/* The navigation link and the delete button are siblings, not nested,
+      {/* The navigation link and the action buttons are siblings, not nested,
           so there's no interactive-inside-anchor issue. */}
       <Link href={`/resume/${id}`} className={styles.cardLink}>
         <span className={styles.badge}>{templateLabel}</span>
@@ -71,6 +136,15 @@ export function ResumeCard({
         <div className={styles.cardMeta}>Updated {updatedLabel}</div>
       </Link>
       <div className={styles.cardActions}>
+        <Tooltip title="Rename">
+          <Button
+            type="text"
+            size="small"
+            aria-label={`Rename ${title}`}
+            icon={<EditOutlined />}
+            onClick={startEditing}
+          />
+        </Tooltip>
         <Tooltip title="Duplicate">
           <Button
             type="text"

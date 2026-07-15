@@ -17,10 +17,24 @@
   flex-direction: column;
   gap: 8px;
   padding: 20px;
-  /* Room so a long title never runs under the action buttons. */
-  padding-right: 76px;
+  /* Room so a long title never runs under the three action buttons. */
+  padding-right: 104px;
   text-decoration: none;
   color: inherit;
+}
+
+/* Edit mode has no top-right action buttons, so the title input keeps the full
+   card width instead of the reserved gutter. */
+.editBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
+.editActions {
+  display: flex;
+  gap: 8px;
 }
 
 .cardTitle {
