@@ -1,0 +1,184 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  /* Theme-aware background, set before paint by the no-flash script + global
+     CSS variables, so the skeleton is correct on the very first frame. */
+  background: var(--workbench-bg);
+  opacity: 1;
+  transition: opacity 0.35s ease;
+  overflow: hidden;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Mirrors the dashboard shell so the skeleton lands where the real content
+   will, making the hand-off read as the page resolving rather than a swap. */
+.shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.titleCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 20px;
+  background: var(--surface);
+}
+
+/* Placeholder blocks: a base fill with a sweeping shimmer. */
+.block {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--surface-border) 65%, var(--workbench-bg));
+}
+
+.block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--surface) 55%, transparent),
+    transparent
+  );
+  animation: fouc-shimmer 1.4s ease-in-out infinite;
+}
+
+.titleLine {
+  width: 220px;
+  height: 26px;
+}
+.subLine {
+  width: 300px;
+  height: 14px;
+}
+.button {
+  width: 130px;
+  height: 40px;
+  border-radius: 8px;
+}
+.badge {
+  width: 64px;
+  height: 18px;
+  border-radius: 999px;
+}
+.cardTitle {
+  width: 70%;
+  height: 18px;
+}
+.cardMeta {
+  width: 45%;
+  height: 13px;
+}
+
+/* Editor route skeleton: top bar + two-pane (editor sections | preview). */
+.editorWrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.editorTopbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.editorBody {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.editorCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionCard {
+  width: 100%;
+  height: 96px;
+  border-radius: 10px;
+}
+
+.previewCol {
+  display: flex;
+}
+
+.preview {
+  width: 100%;
+  min-height: 520px;
+  border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+  .editorBody {
+    grid-template-columns: 1fr;
+  }
+  .previewCol {
+    display: none;
+  }
+}
+
+@keyframes fouc-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .block::after {
+    animation: none;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
