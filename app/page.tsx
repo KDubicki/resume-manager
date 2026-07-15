@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { NewResumeButton } from "@/components/dashboard/new-resume-button";
+import { ResumeCard } from "@/components/dashboard/resume-card";
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
 import { resumeContentSchema } from "@/lib/schemas/resume";
@@ -55,13 +54,13 @@ export default async function DashboardPage() {
           {resumes.map((resume) => {
             const template = templateOf(resume.content);
             return (
-              <Link key={resume.id} href={`/resume/${resume.id}`} className={styles.card}>
-                <span className={styles.badge}>{TEMPLATE_LABEL[template] ?? template}</span>
-                <h2 className={styles.cardTitle}>{resume.title}</h2>
-                <div className={styles.cardMeta}>
-                  Updated {dateFormat.format(resume.updatedAt)}
-                </div>
-              </Link>
+              <ResumeCard
+                key={resume.id}
+                id={resume.id}
+                title={resume.title}
+                templateLabel={TEMPLATE_LABEL[template] ?? template}
+                updatedLabel={dateFormat.format(resume.updatedAt)}
+              />
             );
           })}
         </div>

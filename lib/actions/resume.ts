@@ -25,6 +25,22 @@ export async function createResume(
   return { id: resume.id };
 }
 
+export async function deleteResume(resumeId: string): Promise<{ ok: boolean }> {
+  try {
+    // Scoped by userId, not just id — the same IDOR guard the rest of the data
+    // layer uses. A resume that belongs to someone else deletes nothing
+    // (count === 0) rather than being removed.
+    const { count } = await prisma.resume.deleteMany({
+      where: { id: resumeId, userId: DEMO_USER_ID },
+    });
+    return { ok: count > 0 };
+  } catch {
+    // A DB-level failure (connection drop, pool exhaustion) surfaces as a typed
+    // result the caller can show, not an unhandled rejection.
+    return { ok: false };
+  }
+}
+
 export async function saveTitle(resumeId: string, title: string): Promise<{ ok: boolean }> {
   const trimmed = title.trim();
   if (!trimmed) return { ok: false };
