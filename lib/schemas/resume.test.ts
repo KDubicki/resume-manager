@@ -1,22 +1,72 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultResumeContent, resumeContentSchema } from "./resume";
+import {
+  defaultResumeContent,
+  normalizeSidebarColumns,
+  resumeContentSchema,
+} from "./resume";
 
 describe("resumeContentSchema", () => {
   it("fills in defaults for an empty payload", () => {
     const result = resumeContentSchema.parse({});
 
     expect(result).toEqual({
+      template: "classic",
+      sidebarColumns: {
+        left: ["contact", "education", "interests", "certifications"],
+        right: ["summary", "experience", "skills", "projects", "languages"],
+      },
+      contact: {
+        fullName: "",
+        headline: "",
+        phone: "",
+        email: "",
+        linkedin: "",
+        location: "",
+      },
       summary: "",
       experience: [],
       education: [],
-      skills: [],
+      projects: [],
+      skillGroups: [],
+      languages: [],
+      certifications: [],
+      interests: "",
     });
     expect(defaultResumeContent).toEqual(result);
   });
 
+  it("defaults the template to classic and accepts sidebar", () => {
+    expect(resumeContentSchema.parse({}).template).toBe("classic");
+    expect(resumeContentSchema.parse({ template: "sidebar" }).template).toBe("sidebar");
+    expect(resumeContentSchema.safeParse({ template: "fancy" }).success).toBe(false);
+  });
+
+  it("parses a legacy blob that predates the new keys", () => {
+    // A row written before contact/projects/skillGroups existed must still
+    // load — every new key has a default, so tolerant parsing backfills them.
+    const legacy = {
+      summary: "Older draft.",
+      experience: [{ company: "Acme", role: "Eng", startDate: "2020" }],
+    };
+
+    const result = resumeContentSchema.safeParse(legacy);
+
+    expect(result.success).toBe(true);
+    expect(result.success && result.data.template).toBe("classic");
+    expect(result.success && result.data.contact.fullName).toBe("");
+    expect(result.success && result.data.skillGroups).toEqual([]);
+    expect(result.success && result.data.projects).toEqual([]);
+  });
+
   it("accepts a fully populated, valid payload", () => {
     const payload = {
+      template: "sidebar" as const,
+      contact: {
+        fullName: "Ada Lovelace",
+        headline: "Systems Engineer",
+        email: "ada@example.com",
+      },
       summary: "Backend engineer focused on reliability.",
       experience: [
         {
@@ -35,11 +85,20 @@ describe("resumeContentSchema", () => {
           endDate: "2019-06",
         },
       ],
-      skills: [{ name: "TypeScript" }, { name: "PostgreSQL" }],
+      projects: [
+        { name: "Pipeline", description: "Data pipeline", highlights: ["Automated ingest"] },
+      ],
+      skillGroups: [{ category: "Programming", skills: ["TypeScript", "Go"] }],
+      languages: [{ name: "English", proficiency: "Native" }],
+      certifications: [{ name: "CCNA" }],
+      interests: "Powerlifting and hiking.",
     };
 
     const result = resumeContentSchema.parse(payload);
 
+    expect(result.template).toBe("sidebar");
+    expect(result.contact.fullName).toBe("Ada Lovelace");
+    expect(result.contact.phone).toBe("");
     expect(result.summary).toBe(payload.summary);
     expect(result.experience[0]).toMatchObject({
       company: "Acme Corp",
@@ -56,7 +115,11 @@ describe("resumeContentSchema", () => {
       fieldOfStudy: "",
       description: "",
     });
-    expect(result.skills.map((s) => s.name)).toEqual(["TypeScript", "PostgreSQL"]);
+    expect(result.projects[0]).toMatchObject({ name: "Pipeline", description: "Data pipeline" });
+    expect(result.skillGroups[0]!.skills).toEqual(["TypeScript", "Go"]);
+    expect(result.languages[0]).toMatchObject({ name: "English", proficiency: "Native" });
+    expect(result.certifications.map((c) => c.name)).toEqual(["CCNA"]);
+    expect(result.interests).toBe("Powerlifting and hiking.");
   });
 
   it("assigns a distinct id to each entry missing one", () => {
@@ -73,10 +136,10 @@ describe("resumeContentSchema", () => {
 
   it("preserves an explicitly provided id", () => {
     const result = resumeContentSchema.parse({
-      skills: [{ id: "fixed-id", name: "Go" }],
+      skillGroups: [{ id: "fixed-id", category: "Languages", skills: ["Go"] }],
     });
 
-    expect(result.skills[0]!.id).toBe("fixed-id");
+    expect(result.skillGroups[0]!.id).toBe("fixed-id");
   });
 
   it.each([
@@ -108,6 +171,15 @@ describe("resumeContentSchema", () => {
     ]);
   });
 
+  it("drops blank skills within a group instead of rejecting it", () => {
+    const result = resumeContentSchema.safeParse({
+      skillGroups: [{ category: "Tools", skills: ["Docker", "", "  ", "Ansible"] }],
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.success && result.data.skillGroups[0]!.skills).toEqual(["Docker", "Ansible"]);
+  });
+
   it("rejects an education entry missing required fields", () => {
     const result = resumeContentSchema.safeParse({
       education: [{ degree: "B.Sc." }],
@@ -115,9 +187,9 @@ describe("resumeContentSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a skill entry with an empty name", () => {
+  it("rejects a project entry with an empty name", () => {
     const result = resumeContentSchema.safeParse({
-      skills: [{ name: "" }],
+      projects: [{ name: "" }],
     });
     expect(result.success).toBe(false);
   });
@@ -127,6 +199,26 @@ describe("resumeContentSchema", () => {
       summary: "a".repeat(2001),
     });
     expect(result.success).toBe(false);
+  });
+
+  it("appends unplaced sidebar sections to the right column", () => {
+    // A layout saved before `languages`/`projects` existed must not silently
+    // drop them — they get appended so they still render and stay editable.
+    const normalized = normalizeSidebarColumns({
+      left: ["contact", "education"],
+      right: ["summary", "experience"],
+    });
+
+    expect(normalized.left).toEqual(["contact", "education"]);
+    expect(normalized.right).toEqual([
+      "summary",
+      "experience",
+      "skills",
+      "projects",
+      "languages",
+      "certifications",
+      "interests",
+    ]);
   });
 
   it("rejects a payload with the wrong top-level shape", () => {

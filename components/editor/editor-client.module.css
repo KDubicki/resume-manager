@@ -1,0 +1,25 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px 0;
+  font-size: 13px;
+  color: var(--muted-ink, #666);
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.previewStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

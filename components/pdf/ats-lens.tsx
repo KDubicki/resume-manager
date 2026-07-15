@@ -11,7 +11,11 @@ function detectSections(content: ResumeContent): string[] {
     content.summary.trim() ? "Summary" : null,
     content.experience.length > 0 ? "Experience" : null,
     content.education.length > 0 ? "Education" : null,
-    content.skills.length > 0 ? "Skills" : null,
+    content.projects.length > 0 ? "Projects" : null,
+    content.skillGroups.length > 0 ? "Skills" : null,
+    content.languages.length > 0 ? "Languages" : null,
+    content.certifications.length > 0 ? "Certifications" : null,
+    content.interests.trim() ? "Interests" : null,
   ].filter((section): section is string => section !== null);
 }
 
@@ -22,12 +26,21 @@ function Row({
 }: {
   label: string;
   value: string;
-  status: "pass" | "pending" | "info";
+  status: "pass" | "pending" | "info" | "warn";
 }) {
   return (
     <div className={styles.row}>
-      <span className={status === "pass" ? styles.checkOk : styles.checkNeutral} aria-hidden="true">
-        {status === "pass" ? "✓" : "·"}
+      <span
+        className={
+          status === "pass"
+            ? styles.checkOk
+            : status === "warn"
+              ? styles.checkWarn
+              : styles.checkNeutral
+        }
+        aria-hidden="true"
+      >
+        {status === "pass" ? "✓" : status === "warn" ? "⚠" : "·"}
       </span>
       <span className={styles.label}>{label}</span>
       <span className={styles.value}>{value}</span>
@@ -38,6 +51,10 @@ function Row({
 export function AtsLens({ content }: { content: ResumeContent }) {
   const [expanded, setExpanded] = useState(false);
   const sections = detectSections(content);
+  // The Sidebar template is a deliberate two-column layout: an honest ATS
+  // parser can interleave the two rails, so we flag it rather than hide it.
+  // Classic stays a single linear pass.
+  const isMultiColumn = content.template === "sidebar";
 
   return (
     <div className={styles.lens}>
@@ -48,17 +65,21 @@ export function AtsLens({ content }: { content: ResumeContent }) {
         aria-expanded={expanded}
         aria-live="polite"
       >
-        {sections.length > 0 ? "✓" : "·"} ATS · {sections.length}{" "}
+        {isMultiColumn ? "⚠" : sections.length > 0 ? "✓" : "·"} ATS · {sections.length}{" "}
         {sections.length === 1 ? "section" : "sections"}
       </button>
       <div className={`font-mono ${styles.panel}`} data-expanded={expanded} aria-live="polite">
         <div className={styles.title}>ATS VIEW</div>
-        {/* These first two are structural guarantees of ResumeDocument
-            (components/pdf/resume-document.tsx) — real Text nodes with an
-            embedded font, single-column layout — not something that can
-            actually fail in this template, so they're always reported ok. */}
+        {/* Text layer is a structural guarantee of every template — real Text
+            nodes with an embedded font — so it's always ok. Reading order
+            depends on the template: Classic is a single linear pass; Sidebar
+            is two columns, which a parser can interleave. */}
         <Row label="Text layer" value="detected" status="pass" />
-        <Row label="Reading order" value="linear" status="pass" />
+        {isMultiColumn ? (
+          <Row label="Reading order" value="2-column — may reduce parsing" status="warn" />
+        ) : (
+          <Row label="Reading order" value="linear" status="pass" />
+        )}
         <Row
           label="Sections"
           value={sections.length > 0 ? sections.join(", ") : "None yet"}

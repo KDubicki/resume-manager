@@ -1,0 +1,71 @@
+import Link from "next/link";
+
+import { NewResumeButton } from "@/components/dashboard/new-resume-button";
+import { DEMO_USER_ID } from "@/lib/constants";
+import { prisma } from "@/lib/db";
+import { resumeContentSchema } from "@/lib/schemas/resume";
+
+import styles from "./dashboard.module.css";
+
+// The dashboard must always reflect the newest set of resumes (a just-created
+// or just-seeded one included), so opt out of static caching.
+export const dynamic = "force-dynamic";
+
+const TEMPLATE_LABEL: Record<string, string> = {
+  classic: "Classic",
+  sidebar: "Sidebar",
+};
+
+function templateOf(content: unknown): string {
+  const parsed = resumeContentSchema.safeParse(content);
+  return parsed.success ? parsed.data.template : "classic";
+}
+
+const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
+
+export default async function DashboardPage() {
+  const resumes = await prisma.resume.findMany({
+    where: { userId: DEMO_USER_ID },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, title: true, content: true, updatedAt: true },
+  });
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div>
+          <h1 className={`font-display ${styles.title}`}>Your resumes</h1>
+          <p className={styles.subtitle}>
+            Write for a person. Export for a parser. Pick a template and build.
+          </p>
+        </div>
+        <NewResumeButton />
+      </div>
+
+      {resumes.length === 0 ? (
+        <div className={styles.empty}>
+          <h2 className="font-display" style={{ margin: 0 }}>
+            No resumes yet
+          </h2>
+          <p className={styles.subtitle}>Create your first one to get started.</p>
+          <NewResumeButton />
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {resumes.map((resume) => {
+            const template = templateOf(resume.content);
+            return (
+              <Link key={resume.id} href={`/resume/${resume.id}`} className={styles.card}>
+                <span className={styles.badge}>{TEMPLATE_LABEL[template] ?? template}</span>
+                <h2 className={styles.cardTitle}>{resume.title}</h2>
+                <div className={styles.cardMeta}>
+                  Updated {dateFormat.format(resume.updatedAt)}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

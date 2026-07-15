@@ -2,14 +2,20 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { FormProvider, useForm, type Resolver } from "react-hook-form";
+import { FormProvider, useForm, useWatch, type Resolver } from "react-hook-form";
 
 import type { SaveStatus } from "@/components/app-shell/save-indicator";
 import { saveDraft } from "@/lib/actions/resume";
 import { resumeContentSchema, type ResumeContent } from "@/lib/schemas/resume";
 
+import { CertificationsSection } from "./certifications-section";
+import { ContactSection } from "./contact-section";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
+import { InterestsSection } from "./interests-section";
+import { LanguagesSection } from "./languages-section";
+import { LayoutSection } from "./layout-section";
+import { ProjectsSection } from "./projects-section";
 import styles from "./resume-editor.module.css";
 import { SkillsSection } from "./skills-section";
 import { SummarySection } from "./summary-section";
@@ -39,6 +45,8 @@ export const ResumeEditor = forwardRef<
     mode: "onBlur",
   });
   const { watch, getValues } = methods;
+  // The sidebar layout editor only makes sense for the two-column template.
+  const template = useWatch({ control: methods.control, name: "template" });
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
@@ -154,10 +162,16 @@ export const ResumeEditor = forwardRef<
   return (
     <FormProvider {...methods}>
       <div className={styles.stack} onBlurCapture={handleBlurCapture}>
+        <ContactSection />
+        {template === "sidebar" ? <LayoutSection /> : null}
         <SummarySection />
         <ExperienceSection />
         <EducationSection />
+        <ProjectsSection />
         <SkillsSection />
+        <LanguagesSection />
+        <CertificationsSection />
+        <InterestsSection />
       </div>
     </FormProvider>
   );

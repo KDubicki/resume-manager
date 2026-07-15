@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Input, Select } from "antd";
+import { Button, Input } from "antd";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 
 import type { ResumeContent } from "@/lib/schemas/resume";
@@ -9,37 +9,45 @@ import type { ResumeContent } from "@/lib/schemas/resume";
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
 
-export function SkillsSection() {
+export function ProjectsSection() {
   const { control } = useFormContext<ResumeContent>();
-  const { fields, append, remove } = useFieldArray({ control, name: "skillGroups" });
+  const { fields, append, remove } = useFieldArray({ control, name: "projects" });
 
   return (
     <SectionCard
-      title="Skills"
-      meta={`${fields.length} ${fields.length === 1 ? "group" : "groups"}`}
+      title="Projects"
+      meta={`${fields.length} ${fields.length === 1 ? "project" : "projects"}`}
     >
       <div className={styles.list}>
         {fields.map((field, index) => (
           <div key={field.id} className={styles.entry}>
             <Controller
-              name={`skillGroups.${index}.category`}
+              name={`projects.${index}.name`}
               control={control}
-              render={({ field }) => (
-                <Input {...field} placeholder="Category (e.g. Programming, Networking)" />
+              render={({ field, fieldState }) => (
+                <Input
+                  {...field}
+                  placeholder="Project name"
+                  status={fieldState.error ? "error" : undefined}
+                />
               )}
             />
             <Controller
-              name={`skillGroups.${index}.skills`}
+              name={`projects.${index}.description`}
               control={control}
               render={({ field }) => (
-                <Select
-                  mode="tags"
-                  aria-label="Skills in this group"
-                  style={{ width: "100%" }}
-                  value={field.value}
-                  onChange={(items: string[]) => field.onChange(items)}
-                  placeholder="Type a skill and press Enter"
-                  tokenSeparators={[","]}
+                <Input.TextArea {...field} rows={2} placeholder="Short description" />
+              )}
+            />
+            <Controller
+              name={`projects.${index}.highlights`}
+              control={control}
+              render={({ field }) => (
+                <Input.TextArea
+                  value={field.value.join("\n")}
+                  onChange={(e) => field.onChange(e.target.value.split("\n"))}
+                  rows={3}
+                  placeholder="One highlight per line"
                 />
               )}
             />
@@ -50,7 +58,7 @@ export function SkillsSection() {
                 icon={<DeleteOutlined />}
                 onClick={() => remove(index)}
               >
-                Remove group
+                Remove
               </Button>
             </div>
           </div>
@@ -61,9 +69,11 @@ export function SkillsSection() {
         block
         icon={<PlusOutlined />}
         style={{ marginTop: 16 }}
-        onClick={() => append({ id: crypto.randomUUID(), category: "", skills: [] })}
+        onClick={() =>
+          append({ id: crypto.randomUUID(), name: "", description: "", highlights: [] })
+        }
       >
-        Add skill group
+        Add project
       </Button>
     </SectionCard>
   );

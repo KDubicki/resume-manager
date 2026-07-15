@@ -2,14 +2,24 @@
 
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
-import { defaultResumeContent, resumeContentSchema } from "@/lib/schemas/resume";
+import {
+  resumeContentSchema,
+  type ResumeTemplate,
+} from "@/lib/schemas/resume";
 
-export async function createResume(title: string): Promise<{ id: string }> {
+export async function createResume(
+  title: string,
+  template: ResumeTemplate = "classic",
+): Promise<{ id: string }> {
+  // Build the starting content from the shared schema so the chosen template
+  // is baked into the JSONB blob from creation (the template lives in
+  // `content`, not a column).
+  const content = resumeContentSchema.parse({ template });
   const resume = await prisma.resume.create({
     data: {
       userId: DEMO_USER_ID,
       title,
-      content: defaultResumeContent,
+      content,
     },
   });
   return { id: resume.id };

@@ -31,7 +31,7 @@ Three architectural decisions drive most of the code and must not be silently vi
 
 2. **One Zod schema, three jobs.** The same Zod schema validates on the **client**, validates on the **server** (Server Action), and defines the shape of the JSONB `content`. Client and server validation must share the schema so the stored blob never drifts.
 
-3. **One PDF component, two render paths.** A single `@react-pdf/renderer` document component is rendered **client-side** for the live preview and **server-side** for the export stream. "What you preview" must equal "what you export" — never fork these into two layouts.
+3. **One PDF component, two render paths.** A single `@react-pdf/renderer` document component (`components/pdf/resume-document.tsx`) is rendered **client-side** for the live preview and **server-side** for the export stream. "What you preview" must equal "what you export" — never fork these into two layouts. It dispatches on `content.template` to one of the layouts in `components/pdf/templates/` (`classic` = single-column/ATS-safe, `sidebar` = two-column). Adding a template means adding a template component + enum value, **not** a second render path. The `sidebar` template deliberately breaks the single-column ATS rule below, so the ATS Lens flags it — keep that warning honest.
 
 ### The three core flows
 

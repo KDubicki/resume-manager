@@ -54,6 +54,11 @@
   opacity: 0.4;
 }
 
+.checkWarn {
+  color: var(--warn-ink, #c8860a);
+  font-weight: 700;
+}
+
 @media (max-width: 767.98px) {
   .chip {
     display: inline-flex;

@@ -199,7 +199,32 @@ enum Status {
 }
 ```
 
-The `content` field is validated on **both** the client and the server with the **same Zod schema**, so the JSONB blob never drifts from an expected shape.
+The `content` field is validated on **both** the client and the server with the **same Zod schema**, so the JSONB blob never drifts from an expected shape. Its shape (see `lib/schemas/resume.ts`):
+
+- `template` — `"classic"` (single-column, ATS-safe) or `"sidebar"` (two-column). Stored **inside** `content`, so switching templates needs no migration.
+- `contact` — full name, headline, phone, email, LinkedIn, location.
+- `summary`, `experience[]`, `education[]`, `projects[]`, `languages[]`, `certifications[]`, `interests`.
+- `skillGroups[]` — categorized skills (`{ category, skills[] }`); the Classic template renders them as chips, the Sidebar template as `Category: …` prose.
+
+### Templates
+
+One `ResumeDocument` (`components/pdf/resume-document.tsx`) dispatches on
+`content.template` to one of two layouts under `components/pdf/templates/`, so
+the live preview and the export stream can never diverge:
+
+- **Classic** — single-column, company-grouped experience, chip skills. Honors all three ATS rules below.
+- **Sidebar** — a deliberate two-column layout (left rail: contact/education/interests/certificates). It **intentionally breaks the single-column rule**, so the ATS Lens flags its reading order as a warning rather than a pass.
+
+### Seed data
+
+`prisma/seed.ts` upserts two ready-made example resumes (one per template) with
+stable ids, reachable from the dashboard. Run it against a live DB:
+
+```bash
+docker compose up -d db
+pnpm prisma migrate deploy
+pnpm db:seed
+```
 
 ---
 
@@ -208,7 +233,7 @@ The `content` field is validated on **both** the client and the server with the 
 ATS parsers do not "see" design — they read characters and their order. The PDF pipeline follows three hard rules:
 
 1. **Text, not images** — the PDF is natively rendered with embedded standard fonts (e.g., Roboto). No text is rasterized.
-2. **Linear reading order** — layout reads top-to-bottom. Avoid multi-column layouts for key sections (Experience) so the parser doesn't interleave headings with descriptions.
+2. **Linear reading order** — layout reads top-to-bottom. Avoid multi-column layouts for key sections (Experience) so the parser doesn't interleave headings with descriptions. The **Sidebar** template is a conscious, ATS-Lens-flagged exception; the **Classic** template is the ATS-safe default.
 3. **Semantic clarity** — section names (Experience, Education, Skills) are written as plain text, never replaced by iconography alone.
 
 ---
