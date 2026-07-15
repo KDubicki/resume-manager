@@ -20,7 +20,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   // shape is what real auth will slot into: a resume that exists but belongs
   // to someone else must 404 exactly like one that doesn't exist at all.
   const resume = await prisma.resume.findFirst({
-    where: { id, userId: DEMO_USER_ID },
+    where: { id, userId: DEMO_USER_ID, deletedAt: null },
   });
 
   if (!resume) {

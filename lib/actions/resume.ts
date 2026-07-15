@@ -29,9 +29,10 @@ export async function duplicateResume(
   resumeId: string,
 ): Promise<{ ok: true; id: string } | { ok: false }> {
   try {
-    // Scoped by userId — a resume that isn't the user's can't be copied.
+    // Scoped by userId + not-trashed — a resume that isn't the user's, or is
+    // in the trash, can't be copied.
     const source = await prisma.resume.findFirst({
-      where: { id: resumeId, userId: DEMO_USER_ID },
+      where: { id: resumeId, userId: DEMO_USER_ID, deletedAt: null },
       select: { title: true, content: true },
     });
     if (!source) return { ok: false };
@@ -48,18 +49,50 @@ export async function duplicateResume(
   }
 }
 
+// Soft delete: move to the trash by stamping `deletedAt`. Reversible via
+// restoreResume. All the "live" queries filter `deletedAt: null`, so a trashed
+// resume vanishes from the dashboard, the editor, and export without the row
+// actually being removed.
 export async function deleteResume(resumeId: string): Promise<{ ok: boolean }> {
   try {
     // Scoped by userId, not just id — the same IDOR guard the rest of the data
-    // layer uses. A resume that belongs to someone else deletes nothing
-    // (count === 0) rather than being removed.
-    const { count } = await prisma.resume.deleteMany({
-      where: { id: resumeId, userId: DEMO_USER_ID },
+    // layer uses. `deletedAt: null` makes this idempotent: re-trashing an
+    // already-trashed resume matches nothing.
+    const { count } = await prisma.resume.updateMany({
+      where: { id: resumeId, userId: DEMO_USER_ID, deletedAt: null },
+      data: { deletedAt: new Date() },
     });
     return { ok: count > 0 };
   } catch {
     // A DB-level failure (connection drop, pool exhaustion) surfaces as a typed
     // result the caller can show, not an unhandled rejection.
+    return { ok: false };
+  }
+}
+
+export async function restoreResume(resumeId: string): Promise<{ ok: boolean }> {
+  try {
+    // Only restores something actually in the trash (`deletedAt: not null`).
+    const { count } = await prisma.resume.updateMany({
+      where: { id: resumeId, userId: DEMO_USER_ID, deletedAt: { not: null } },
+      data: { deletedAt: null },
+    });
+    return { ok: count > 0 };
+  } catch {
+    return { ok: false };
+  }
+}
+
+// Hard delete — only reachable from the trash view. Guarded to `deletedAt: not
+// null` so a live resume can never be permanently removed by id alone; it must
+// be trashed first.
+export async function deleteResumePermanently(resumeId: string): Promise<{ ok: boolean }> {
+  try {
+    const { count } = await prisma.resume.deleteMany({
+      where: { id: resumeId, userId: DEMO_USER_ID, deletedAt: { not: null } },
+    });
+    return { ok: count > 0 };
+  } catch {
     return { ok: false };
   }
 }
@@ -70,7 +103,7 @@ export async function saveTitle(resumeId: string, title: string): Promise<{ ok: 
 
   try {
     const { count } = await prisma.resume.updateMany({
-      where: { id: resumeId, userId: DEMO_USER_ID, status: "DRAFT" },
+      where: { id: resumeId, userId: DEMO_USER_ID, status: "DRAFT", deletedAt: null },
       data: { title: trimmed },
     });
     return { ok: count > 0 };
@@ -89,7 +122,7 @@ export async function saveDraft(resumeId: string, content: unknown): Promise<Sav
 
   try {
     const { count } = await prisma.resume.updateMany({
-      where: { id: resumeId, userId: DEMO_USER_ID, status: "DRAFT" },
+      where: { id: resumeId, userId: DEMO_USER_ID, status: "DRAFT", deletedAt: null },
       data: { content: parsed.data },
     });
 

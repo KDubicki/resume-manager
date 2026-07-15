@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { NewResumeButton } from "@/components/dashboard/new-resume-button";
 import { ResumeCard } from "@/components/dashboard/resume-card";
 import { DEMO_USER_ID } from "@/lib/constants";
@@ -24,9 +26,13 @@ const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
 
 export default async function DashboardPage() {
   const resumes = await prisma.resume.findMany({
-    where: { userId: DEMO_USER_ID },
+    where: { userId: DEMO_USER_ID, deletedAt: null },
     orderBy: { updatedAt: "desc" },
     select: { id: true, title: true, content: true, updatedAt: true },
+  });
+
+  const trashedCount = await prisma.resume.count({
+    where: { userId: DEMO_USER_ID, deletedAt: { not: null } },
   });
 
   return (
@@ -38,7 +44,14 @@ export default async function DashboardPage() {
             Write for a person. Export for a parser. Pick a template and build.
           </p>
         </div>
-        <NewResumeButton />
+        <div className={styles.headerActions}>
+          {trashedCount > 0 ? (
+            <Link href="/trash" className={styles.trashLink}>
+              Trash ({trashedCount})
+            </Link>
+          ) : null}
+          <NewResumeButton />
+        </div>
       </div>
 
       {resumes.length === 0 ? (

@@ -116,7 +116,7 @@ export function ResumeCard({
         message.error("Couldn't delete that resume — try again.");
         return;
       }
-      message.success(`Deleted "${title}"`);
+      message.success(`Moved "${title}" to trash`);
       // Re-run the dashboard server component so the card disappears.
       router.refresh();
     } catch {
@@ -156,9 +156,9 @@ export function ResumeCard({
           />
         </Tooltip>
         <Popconfirm
-          title="Delete this resume?"
-          description="This can't be undone."
-          okText="Delete"
+          title="Move to trash?"
+          description="You can restore it from the trash later."
+          okText="Move to trash"
           okButtonProps={{ danger: true, loading: deleting }}
           cancelText="Cancel"
           onConfirm={handleDelete}
@@ -166,7 +166,7 @@ export function ResumeCard({
           <Button
             type="text"
             size="small"
-            aria-label={`Delete ${title}`}
+            aria-label={`Move ${title} to trash`}
             icon={<DeleteOutlined />}
             className={styles.deleteButton}
           />

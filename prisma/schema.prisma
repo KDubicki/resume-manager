@@ -7,15 +7,19 @@ datasource db {
 }
 
 model Resume {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
   title     String
-  status    Status   @default(DRAFT)
+  status    Status    @default(DRAFT)
   content   Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  // Soft delete: non-null means the resume is in the trash. Every "live" query
+  // filters `deletedAt: null`; the trash view filters `deletedAt: not null`.
+  deletedAt DateTime?
 
   @@index([userId, status])
+  @@index([userId, deletedAt])
 }
 
 enum Status {

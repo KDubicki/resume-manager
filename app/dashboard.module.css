@@ -23,6 +23,24 @@
   max-width: 460px;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.trashLink {
+  font-size: 14px;
+  color: var(--muted-ink, #666);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.trashLink:hover {
+  color: var(--accent, #2a6cf0);
+  text-decoration: underline;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
