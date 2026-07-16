@@ -1,9 +1,15 @@
 "use client";
 
-import { ColorPicker } from "antd";
+import { ColorPicker, Select } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 
-import { DEFAULT_ACCENT, type ResumeContent } from "@/lib/schemas/resume";
+import {
+  DEFAULT_ACCENT,
+  DEFAULT_FONT_FAMILY,
+  FONT_FAMILIES,
+  FONT_FAMILY_LABELS,
+  type ResumeContent,
+} from "@/lib/schemas/resume";
 
 import styles from "./appearance-section.module.css";
 import { SectionCard } from "./section-card";
@@ -11,6 +17,11 @@ import { SectionCard } from "./section-card";
 // A small curated set so a click gets a tasteful accent; the picker still
 // allows any custom hex.
 const PRESETS = ["#2a6cf0", "#0f766e", "#b23a48", "#7c3aed", "#c2410c", "#1a1a1a"];
+
+const FONT_OPTIONS = FONT_FAMILIES.map((family) => ({
+  value: family,
+  label: FONT_FAMILY_LABELS[family],
+}));
 
 export function AppearanceSection() {
   const { control } = useFormContext<ResumeContent>();
@@ -38,6 +49,24 @@ export function AppearanceSection() {
         />
       </div>
       <p className={styles.note}>Tints section headings and skill chips in both templates.</p>
+
+      <div className={styles.row}>
+        <span className={styles.label}>Font</span>
+        <Controller
+          name="theme.fontFamily"
+          control={control}
+          render={({ field }) => (
+            <Select
+              value={field.value ?? DEFAULT_FONT_FAMILY}
+              onChange={field.onChange}
+              options={FONT_OPTIONS}
+              aria-label="Font family"
+              className={styles.fontSelect}
+            />
+          )}
+        />
+      </div>
+      <p className={styles.note}>All options are embedded, ATS-safe typefaces.</p>
     </SectionCard>
   );
 }

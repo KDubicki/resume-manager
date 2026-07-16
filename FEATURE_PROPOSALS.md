@@ -79,8 +79,8 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
 
 - [x] **[TP-1] Akcent kolorystyczny** — jedno pole `content.theme.accent`, użyte w nagłówkach/chipach obu szablonów. ✅ zrobione
   _Gdzie:_ `lib/schemas/resume.ts`, `components/pdf/templates/*`, `components/editor/appearance-section.tsx`. _Rozmiar:_ S.
-- [ ] **[TP-2] Wybór czcionki** — 2–3 osadzone kroje ATS-safe (Roboto już jest; dodać np. Lato/Source Sans).
-  _Gdzie:_ `components/pdf/register-fonts.ts`, szablony. _Rozmiar:_ M.
+- [x] **[TP-2] Wybór czcionki** — 2–3 osadzone kroje ATS-safe (Roboto, Lato, Tinos serif). ✅ zrobione
+  _Gdzie:_ `components/pdf/register-fonts.ts`, `lib/schemas/resume.ts`, szablony, `appearance-section.tsx`. _Rozmiar:_ M.
 - [ ] **[TP-3] Gęstość / rozmiar tekstu** — „compact / normal / relaxed" (skala paddingów i fontSize).
   _Gdzie:_ szablony. _Rozmiar:_ S.
 - [ ] **[TP-4] Widoczność sekcji (toggle)** — ukryj sekcję bez kasowania danych (`content` flaga per sekcja).

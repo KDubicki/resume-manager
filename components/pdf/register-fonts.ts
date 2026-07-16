@@ -1,10 +1,15 @@
 import { Font } from "@react-pdf/renderer";
 
-const FONT_FILES = [
-  { file: "Roboto-Regular.ttf", fontWeight: 400 as const, fontStyle: "normal" as const },
-  { file: "Roboto-Bold.ttf", fontWeight: 700 as const, fontStyle: "normal" as const },
-  { file: "Roboto-Italic.ttf", fontWeight: 400 as const, fontStyle: "italic" as const },
-  { file: "Roboto-BoldItalic.ttf", fontWeight: 700 as const, fontStyle: "italic" as const },
+import { FONT_FAMILIES } from "@/lib/schemas/resume";
+
+// The four style slots every selectable family ships, mapped to the
+// `${Family}-${slot}.ttf` files in public/fonts. Adding a family to
+// FONT_FAMILIES (+ its four files) is all it takes to make it selectable.
+const STYLE_SLOTS = [
+  { slot: "Regular", fontWeight: 400 as const, fontStyle: "normal" as const },
+  { slot: "Bold", fontWeight: 700 as const, fontStyle: "normal" as const },
+  { slot: "Italic", fontWeight: 400 as const, fontStyle: "italic" as const },
+  { slot: "BoldItalic", fontWeight: 700 as const, fontStyle: "italic" as const },
 ];
 
 // Caches the in-flight/completed registration *promise* itself (not a
@@ -26,16 +31,20 @@ async function toSrc(file: string): Promise<string> {
 }
 
 async function doRegister(): Promise<void> {
-  Font.register({
-    family: "Roboto",
-    fonts: await Promise.all(
-      FONT_FILES.map(async ({ file, fontWeight, fontStyle }) => ({
-        src: await toSrc(file),
-        fontWeight,
-        fontStyle,
-      })),
-    ),
-  });
+  await Promise.all(
+    FONT_FAMILIES.map(async (family) => {
+      Font.register({
+        family,
+        fonts: await Promise.all(
+          STYLE_SLOTS.map(async ({ slot, fontWeight, fontStyle }) => ({
+            src: await toSrc(`${family}-${slot}.ttf`),
+            fontWeight,
+            fontStyle,
+          })),
+        ),
+      });
+    }),
+  );
 }
 
 // Same font, two sources: the server-side export (Step 9) reads the TTFs

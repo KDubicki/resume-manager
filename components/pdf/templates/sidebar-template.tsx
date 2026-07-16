@@ -16,7 +16,6 @@ const RULE = "#bbbbbb";
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Roboto",
     fontSize: 9.5,
     color: INK,
     paddingTop: 34,
@@ -140,6 +139,7 @@ function SidebarSectionTitle({
 export function SidebarTemplate({ title, content }: { title: string; content: ResumeContent }) {
   const { contact } = content;
   const accent = content.theme.accent;
+  const fontFamily = content.theme.fontFamily;
   const contactRows: { label: string; value: string }[] = [
     { label: "Phone: ", value: contact.phone },
     { label: "E-mail: ", value: contact.email },
@@ -257,7 +257,7 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
   }
 
   return (
-    <Page size="A4" style={styles.page}>
+    <Page size="A4" style={[styles.page, { fontFamily }]}>
       <Text style={styles.name}>{displayName(contact, title)}</Text>
       {contact.headline.trim() ? <Text style={styles.headline}>{contact.headline}</Text> : null}
       <View style={[styles.headerRule, { borderBottomColor: accent }]} />

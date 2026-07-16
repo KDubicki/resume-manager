@@ -141,12 +141,32 @@ export function normalizeSidebarColumns(columns: SidebarColumns): SidebarColumns
 // invalid color (which @react-pdf would throw on).
 export const DEFAULT_ACCENT = "#2a6cf0";
 
+// The selectable resume typefaces. All three are embedded (public/fonts) and
+// ATS-safe — real text in a standard face, never rasterized. Each family ships
+// the same four style slots (see register-fonts.ts). Adding a family here means
+// adding its four `${Family}-${slot}.ttf` files; nothing else needs to change.
+export const FONT_FAMILIES = ["Roboto", "Lato", "Tinos"] as const;
+export type FontFamily = (typeof FONT_FAMILIES)[number];
+export const DEFAULT_FONT_FAMILY: FontFamily = "Roboto";
+
+// Human-readable labels for the font picker (kept next to the enum so the two
+// never drift). Tinos is Times-metric-compatible, hence the note.
+export const FONT_FAMILY_LABELS: Record<FontFamily, string> = {
+  Roboto: "Roboto (sans-serif)",
+  Lato: "Lato (sans-serif)",
+  Tinos: "Tinos (serif)",
+};
+
 export const themeSchema = z.object({
   accent: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
     .catch(DEFAULT_ACCENT)
     .default(DEFAULT_ACCENT),
+  // `.catch` falls back to the default for any unknown value (e.g. a family
+  // removed later), so an old blob never fails validation or renders in a font
+  // that isn't registered.
+  fontFamily: z.enum(FONT_FAMILIES).catch(DEFAULT_FONT_FAMILY).default(DEFAULT_FONT_FAMILY),
 });
 
 export type ResumeTheme = z.infer<typeof themeSchema>;

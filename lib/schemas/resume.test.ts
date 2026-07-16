@@ -14,6 +14,7 @@ describe("resumeContentSchema", () => {
       template: "classic",
       theme: {
         accent: "#2a6cf0",
+        fontFamily: "Roboto",
       },
       sidebarColumns: {
         left: ["contact", "education", "interests", "certifications"],
@@ -54,6 +55,18 @@ describe("resumeContentSchema", () => {
     // `.catch` falls back to the default instead.
     expect(resumeContentSchema.parse({ theme: { accent: "not-a-color" } }).theme.accent).toBe(
       "#2a6cf0",
+    );
+  });
+
+  it("defaults the font, accepts a known family, and falls back on an unknown one", () => {
+    expect(resumeContentSchema.parse({}).theme.fontFamily).toBe("Roboto");
+    expect(resumeContentSchema.parse({ theme: { fontFamily: "Tinos" } }).theme.fontFamily).toBe(
+      "Tinos",
+    );
+    // An unknown family (e.g. one removed later) must not fail the parse; it
+    // falls back to the default so it never renders in an unregistered font.
+    expect(resumeContentSchema.parse({ theme: { fontFamily: "Comic Sans" } }).theme.fontFamily).toBe(
+      "Roboto",
     );
   });
 

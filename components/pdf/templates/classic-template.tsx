@@ -7,7 +7,6 @@ import { BulletList, contactParts, displayName, formatRange, groupByCompany } fr
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Roboto",
     fontSize: 10.5,
     color: "#1a1a1a",
     paddingTop: 40,
@@ -140,12 +139,13 @@ function Section({
 export function ClassicTemplate({ title, content }: { title: string; content: ResumeContent }) {
   const { contact } = content;
   const accent = content.theme.accent;
+  const fontFamily = content.theme.fontFamily;
   const parts = contactParts(contact);
 
   return (
     // Single column: layout reads top-to-bottom in one linear pass, so an ATS
     // parser never has to guess reading order.
-    <Page size="A4" style={styles.page}>
+    <Page size="A4" style={[styles.page, { fontFamily }]}>
       <Text style={styles.name}>{displayName(contact, title)}</Text>
       {contact.headline.trim() ? <Text style={styles.headline}>{contact.headline}</Text> : null}
       {parts.length > 0 ? <Text style={styles.contactLine}>{parts.join("  ·  ")}</Text> : null}

@@ -13,3 +13,11 @@
   font-size: 13px;
   color: var(--muted-ink, #666);
 }
+
+.row + .row {
+  margin-top: 16px;
+}
+
+.fontSelect {
+  min-width: 200px;
+}
