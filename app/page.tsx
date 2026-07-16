@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { NewResumeButton } from "@/components/dashboard/new-resume-button";
-import { ResumeCard } from "@/components/dashboard/resume-card";
+import { ResumeList } from "@/components/dashboard/resume-list";
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
 import { resumeContentSchema } from "@/lib/schemas/resume";
@@ -63,20 +63,18 @@ export default async function DashboardPage() {
           <NewResumeButton />
         </div>
       ) : (
-        <div className={styles.grid}>
-          {resumes.map((resume) => {
+        <ResumeList
+          resumes={resumes.map((resume) => {
             const template = templateOf(resume.content);
-            return (
-              <ResumeCard
-                key={resume.id}
-                id={resume.id}
-                title={resume.title}
-                templateLabel={TEMPLATE_LABEL[template] ?? template}
-                updatedLabel={dateFormat.format(resume.updatedAt)}
-              />
-            );
+            return {
+              id: resume.id,
+              title: resume.title,
+              templateLabel: TEMPLATE_LABEL[template] ?? template,
+              updatedAt: resume.updatedAt.getTime(),
+              updatedLabel: dateFormat.format(resume.updatedAt),
+            };
           })}
-        </div>
+        />
       )}
     </div>
   );

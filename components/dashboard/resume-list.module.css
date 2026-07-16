@@ -1,0 +1,26 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.search {
+  flex: 1 1 240px;
+  max-width: 360px;
+}
+
+.sort {
+  min-width: 200px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.emptyResult {
+  margin: 48px 0;
+}
