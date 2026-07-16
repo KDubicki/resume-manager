@@ -143,6 +143,9 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
   const accent = content.theme.accent;
   const fontFamily = content.theme.fontFamily;
   const styles = scaleStyleSheet(baseStyles, content.theme.density);
+  // Set<string> (not Set<ToggleableSection>) so `contact` — a Sidebar column
+  // key that isn't user-toggleable — can be tested without a type cast.
+  const hidden = new Set<string>(content.hiddenSections);
   const contactRows: { label: string; value: string }[] = [
     { label: "Phone: ", value: contact.phone },
     { label: "E-mail: ", value: contact.email },
@@ -246,9 +249,9 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
   const columns = normalizeSidebarColumns(content.sidebarColumns);
 
   function renderColumn(keys: SidebarSectionKey[]) {
-    // Drop empty sections first so the "first" (no top margin) styling lands on
-    // whichever section actually renders at the top of the column.
-    const present = keys.filter((key) => bodies[key] != null);
+    // Drop empty and hidden sections first so the "first" (no top margin)
+    // styling lands on whichever section actually renders at the top.
+    const present = keys.filter((key) => bodies[key] != null && !hidden.has(key));
     return present.map((key, index) => (
       <View key={key}>
         <SidebarSectionTitle accent={accent} styles={styles} first={index === 0}>

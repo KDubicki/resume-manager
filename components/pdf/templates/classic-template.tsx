@@ -150,6 +150,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
   const accent = content.theme.accent;
   const fontFamily = content.theme.fontFamily;
   const styles = scaleStyleSheet(baseStyles, content.theme.density);
+  const hidden = new Set(content.hiddenSections);
   const parts = contactParts(contact);
 
   return (
@@ -160,13 +161,13 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       {contact.headline.trim() ? <Text style={styles.headline}>{contact.headline}</Text> : null}
       {parts.length > 0 ? <Text style={styles.contactLine}>{parts.join("  ·  ")}</Text> : null}
 
-      {content.summary.trim() ? (
+      {content.summary.trim() && !hidden.has("summary") ? (
         <Section title="Summary" accent={accent} styles={styles}>
           <Text style={styles.paragraph}>{content.summary}</Text>
         </Section>
       ) : null}
 
-      {content.experience.length > 0 ? (
+      {content.experience.length > 0 && !hidden.has("experience") ? (
         <Section title="Experience" accent={accent} styles={styles}>
           {groupByCompany(content.experience).map((group, groupIndex) => {
             const first = group.entries[0]!;
@@ -197,7 +198,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
         </Section>
       ) : null}
 
-      {content.education.length > 0 ? (
+      {content.education.length > 0 && !hidden.has("education") ? (
         <Section title="Education" accent={accent} styles={styles}>
           {content.education.map((entry) => (
             <View key={entry.id} style={styles.entry} wrap={false}>
@@ -217,7 +218,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
         </Section>
       ) : null}
 
-      {content.projects.length > 0 ? (
+      {content.projects.length > 0 && !hidden.has("projects") ? (
         <Section title="Projects" accent={accent} styles={styles}>
           {content.projects.map((project) => (
             <View key={project.id} style={styles.entry} wrap={false}>
@@ -231,7 +232,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
         </Section>
       ) : null}
 
-      {content.skillGroups.length > 0 ? (
+      {content.skillGroups.length > 0 && !hidden.has("skills") ? (
         <Section title="Skills" accent={accent} styles={styles}>
           {content.skillGroups.map((group) => (
             <View key={group.id} style={styles.skillGroup} wrap={false}>
@@ -250,7 +251,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
         </Section>
       ) : null}
 
-      {content.languages.length > 0 ? (
+      {content.languages.length > 0 && !hidden.has("languages") ? (
         <Section title="Languages" accent={accent} styles={styles}>
           <Text style={styles.paragraph}>
             {content.languages
@@ -260,7 +261,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
         </Section>
       ) : null}
 
-      {content.certifications.length > 0 ? (
+      {content.certifications.length > 0 && !hidden.has("certifications") ? (
         <Section title="Certifications & Courses" accent={accent} styles={styles}>
           {content.certifications.map((cert) => (
             <View key={cert.id} style={styles.bullet}>

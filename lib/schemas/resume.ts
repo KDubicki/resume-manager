@@ -111,6 +111,35 @@ export const SIDEBAR_SECTION_LABELS: Record<SidebarSectionKey, string> = {
   interests: "My Interests",
 };
 
+// Sections a user can hide without deleting their data (TP-4). `contact` is
+// deliberately excluded — it's the header identity, always shown. A hidden
+// section keeps its content in the blob and still appears in the editor; only
+// the rendered PDF (both templates) skips it, so hiding is fully reversible.
+export const TOGGLEABLE_SECTIONS = [
+  "summary",
+  "experience",
+  "education",
+  "skills",
+  "projects",
+  "languages",
+  "certifications",
+  "interests",
+] as const;
+
+export type ToggleableSection = (typeof TOGGLEABLE_SECTIONS)[number];
+
+// Editor-facing labels (neutral, unlike the Sidebar's stylized "About Me").
+export const TOGGLEABLE_SECTION_LABELS: Record<ToggleableSection, string> = {
+  summary: "Summary",
+  experience: "Experience",
+  education: "Education",
+  skills: "Skills",
+  projects: "Projects",
+  languages: "Languages",
+  certifications: "Certifications",
+  interests: "Interests",
+};
+
 // Which column each Sidebar section lives in, and its order within that
 // column. The defaults reproduce the reference two-column CV.
 export const sidebarColumnsSchema = z.object({
@@ -192,6 +221,10 @@ export const resumeContentSchema = z.object({
   // `.prefault({})` runs an empty object through the schema so `accent` gets its
   // default, instead of storing a literal `{}` with an undefined accent.
   theme: themeSchema.prefault({}),
+  // Sections the user has hidden (TP-4). Data for a hidden section is kept;
+  // only the rendered PDF skips it. `.catch([])` drops the whole array if it's
+  // malformed rather than failing the parse, so a bad value never blocks a save.
+  hiddenSections: z.array(z.enum(TOGGLEABLE_SECTIONS)).catch([]).default([]),
   // Sidebar-only: ignored by the Classic (single-column) template.
   sidebarColumns: sidebarColumnsSchema.default(DEFAULT_SIDEBAR_COLUMNS),
   // `.prefault` (not `.default`) so a missing `contact` is run through the

@@ -17,6 +17,7 @@ describe("resumeContentSchema", () => {
         fontFamily: "Roboto",
         density: "normal",
       },
+      hiddenSections: [],
       sidebarColumns: {
         left: ["contact", "education", "interests", "certifications"],
         right: ["summary", "experience", "skills", "projects", "languages"],
@@ -77,6 +78,16 @@ describe("resumeContentSchema", () => {
       "compact",
     );
     expect(resumeContentSchema.parse({ theme: { density: "tiny" } }).theme.density).toBe("normal");
+  });
+
+  it("defaults hiddenSections to empty, keeps valid keys, and drops a bad array", () => {
+    expect(resumeContentSchema.parse({}).hiddenSections).toEqual([]);
+    expect(
+      resumeContentSchema.parse({ hiddenSections: ["summary", "projects"] }).hiddenSections,
+    ).toEqual(["summary", "projects"]);
+    // A malformed array (unknown key) `.catch`es to [] rather than failing the
+    // whole parse, so a bad value never blocks autosave.
+    expect(resumeContentSchema.parse({ hiddenSections: ["bogus"] }).hiddenSections).toEqual([]);
   });
 
   it("parses a legacy blob that predates the new keys", () => {

@@ -83,8 +83,8 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
   _Gdzie:_ `components/pdf/register-fonts.ts`, `lib/schemas/resume.ts`, szablony, `appearance-section.tsx`. _Rozmiar:_ M.
 - [x] **[TP-3] Gęstość / rozmiar tekstu** — „compact / normal / relaxed" (skala paddingów i fontSize). ✅ zrobione
   _Gdzie:_ `lib/schemas/resume.ts`, `components/pdf/templates/shared.tsx` (`scaleStyleSheet`), szablony, `appearance-section.tsx`. _Rozmiar:_ S.
-- [ ] **[TP-4] Widoczność sekcji (toggle)** — ukryj sekcję bez kasowania danych (`content` flaga per sekcja).
-  _Gdzie:_ schema + edytor + szablony. _Rozmiar:_ M.
+- [x] **[TP-4] Widoczność sekcji (toggle)** — ukryj sekcję bez kasowania danych (`content.hiddenSections`). ✅ zrobione
+  _Gdzie:_ `lib/schemas/resume.ts`, `components/editor/sections-visibility.tsx`, oba szablony. _Rozmiar:_ M.
 - [ ] **[TP-5] Kolejność sekcji w Classic** — analogicznie do Sidebara (`sidebarColumns`), lista kolejności dla Classic.
   _Gdzie:_ `lib/schemas/resume.ts`, `classic-template.tsx`, `layout-section.tsx`. _Rozmiar:_ M.
 - [ ] **[TP-6] Kolejny szablon** — np. „Timeline" albo „Minimal one-page".

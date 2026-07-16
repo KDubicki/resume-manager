@@ -18,6 +18,7 @@ import { LanguagesSection } from "./languages-section";
 import { LayoutSection } from "./layout-section";
 import { ProjectsSection } from "./projects-section";
 import styles from "./resume-editor.module.css";
+import { SectionsVisibility } from "./sections-visibility";
 import { SkillsSection } from "./skills-section";
 import { SummarySection } from "./summary-section";
 
@@ -165,6 +166,7 @@ export const ResumeEditor = forwardRef<
       <div className={styles.stack} onBlurCapture={handleBlurCapture}>
         <ContactSection />
         <AppearanceSection />
+        <SectionsVisibility />
         {template === "sidebar" ? <LayoutSection /> : null}
         <SummarySection />
         <ExperienceSection />

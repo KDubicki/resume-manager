@@ -1,0 +1,21 @@
+.note {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--muted-ink, #666);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px 16px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.itemLabel {
+  font-size: 14px;
+}
