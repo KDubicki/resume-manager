@@ -88,7 +88,6 @@ const styles = StyleSheet.create({
   },
   skillGroupLabel: {
     fontWeight: 700,
-    color: "#2a6cf0",
     marginBottom: 4,
   },
   chipRow: {
@@ -113,14 +112,24 @@ const styles = StyleSheet.create({
 // strand alone at the bottom of a page while its content flows onto the next
 // (which is what produced the ugly gap + page-break in Education). Remaining
 // blocks flow normally so a long section still paginates.
-function Section({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
+function Section({
+  title,
+  accent,
+  children,
+}: {
+  title: React.ReactNode;
+  accent: string;
+  children: React.ReactNode;
+}) {
   const items = Children.toArray(children);
   if (items.length === 0) return null;
   const [firstItem, ...rest] = items;
   return (
     <View>
       <View wrap={false}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={[styles.sectionTitle, { color: accent, borderBottomColor: accent }]}>
+          {title}
+        </Text>
         {firstItem}
       </View>
       {rest}
@@ -130,6 +139,7 @@ function Section({ title, children }: { title: React.ReactNode; children: React.
 
 export function ClassicTemplate({ title, content }: { title: string; content: ResumeContent }) {
   const { contact } = content;
+  const accent = content.theme.accent;
   const parts = contactParts(contact);
 
   return (
@@ -141,13 +151,13 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       {parts.length > 0 ? <Text style={styles.contactLine}>{parts.join("  ·  ")}</Text> : null}
 
       {content.summary.trim() ? (
-        <Section title="Summary">
+        <Section title="Summary" accent={accent}>
           <Text style={styles.paragraph}>{content.summary}</Text>
         </Section>
       ) : null}
 
       {content.experience.length > 0 ? (
-        <Section title="Experience">
+        <Section title="Experience" accent={accent}>
           {groupByCompany(content.experience).map((group, groupIndex) => {
             const first = group.entries[0]!;
             const last = group.entries[group.entries.length - 1]!;
@@ -178,7 +188,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.education.length > 0 ? (
-        <Section title="Education">
+        <Section title="Education" accent={accent}>
           {content.education.map((entry) => (
             <View key={entry.id} style={styles.entry} wrap={false}>
               <View style={styles.entryHeaderRow}>
@@ -198,7 +208,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.projects.length > 0 ? (
-        <Section title="Projects">
+        <Section title="Projects" accent={accent}>
           {content.projects.map((project) => (
             <View key={project.id} style={styles.entry} wrap={false}>
               <Text style={styles.entryTitle}>{project.name}</Text>
@@ -212,15 +222,15 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.skillGroups.length > 0 ? (
-        <Section title="Skills">
+        <Section title="Skills" accent={accent}>
           {content.skillGroups.map((group) => (
             <View key={group.id} style={styles.skillGroup} wrap={false}>
               {group.category.trim() ? (
-                <Text style={styles.skillGroupLabel}>{group.category}</Text>
+                <Text style={[styles.skillGroupLabel, { color: accent }]}>{group.category}</Text>
               ) : null}
               <View style={styles.chipRow}>
                 {group.skills.map((skill, index) => (
-                  <Text key={index} style={styles.chip}>
+                  <Text key={index} style={[styles.chip, { borderColor: accent, color: accent }]}>
                     {skill}
                   </Text>
                 ))}
@@ -231,7 +241,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.languages.length > 0 ? (
-        <Section title="Languages">
+        <Section title="Languages" accent={accent}>
           <Text style={styles.paragraph}>
             {content.languages
               .map((lang) => (lang.proficiency ? `${lang.name} (${lang.proficiency})` : lang.name))
@@ -241,7 +251,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.certifications.length > 0 ? (
-        <Section title="Certifications & Courses">
+        <Section title="Certifications & Courses" accent={accent}>
           {content.certifications.map((cert) => (
             <View key={cert.id} style={styles.bullet}>
               <Text style={styles.bulletDot}>{"•"}</Text>

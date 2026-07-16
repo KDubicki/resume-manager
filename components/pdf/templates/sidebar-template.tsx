@@ -119,9 +119,19 @@ const styles = StyleSheet.create({
   },
 });
 
-function SidebarSectionTitle({ children, first }: { children: string; first?: boolean }) {
+function SidebarSectionTitle({
+  children,
+  accent,
+  first,
+}: {
+  children: string;
+  accent: string;
+  first?: boolean;
+}) {
   return (
-    <Text style={[styles.sectionTitle, ...(first ? [styles.sectionTitleFirst] : [])]}>
+    <Text
+      style={[styles.sectionTitle, { color: accent }, ...(first ? [styles.sectionTitleFirst] : [])]}
+    >
       {children}
     </Text>
   );
@@ -129,6 +139,7 @@ function SidebarSectionTitle({ children, first }: { children: string; first?: bo
 
 export function SidebarTemplate({ title, content }: { title: string; content: ResumeContent }) {
   const { contact } = content;
+  const accent = content.theme.accent;
   const contactRows: { label: string; value: string }[] = [
     { label: "Phone: ", value: contact.phone },
     { label: "E-mail: ", value: contact.email },
@@ -237,7 +248,9 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
     const present = keys.filter((key) => bodies[key] != null);
     return present.map((key, index) => (
       <View key={key}>
-        <SidebarSectionTitle first={index === 0}>{SIDEBAR_SECTION_LABELS[key]}</SidebarSectionTitle>
+        <SidebarSectionTitle accent={accent} first={index === 0}>
+          {SIDEBAR_SECTION_LABELS[key]}
+        </SidebarSectionTitle>
         {bodies[key]}
       </View>
     ));
@@ -247,7 +260,7 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
     <Page size="A4" style={styles.page}>
       <Text style={styles.name}>{displayName(contact, title)}</Text>
       {contact.headline.trim() ? <Text style={styles.headline}>{contact.headline}</Text> : null}
-      <View style={styles.headerRule} />
+      <View style={[styles.headerRule, { borderBottomColor: accent }]} />
 
       <View style={styles.columns}>
         <View style={styles.sidebar}>{renderColumn(columns.left)}</View>

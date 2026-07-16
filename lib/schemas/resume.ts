@@ -134,8 +134,29 @@ export function normalizeSidebarColumns(columns: SidebarColumns): SidebarColumns
   return { left: columns.left, right: [...columns.right, ...missing] };
 }
 
+// A single accent color (6-digit hex) applied to section headings and skill
+// chips in both templates. `.catch` falls back to the default rather than
+// failing validation, so a malformed value — e.g. a half-typed hex during a
+// mid-edit autosave — never blocks a save or reaches the PDF renderer as an
+// invalid color (which @react-pdf would throw on).
+export const DEFAULT_ACCENT = "#2a6cf0";
+
+export const themeSchema = z.object({
+  accent: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .catch(DEFAULT_ACCENT)
+    .default(DEFAULT_ACCENT),
+});
+
+export type ResumeTheme = z.infer<typeof themeSchema>;
+
 export const resumeContentSchema = z.object({
   template: templateSchema,
+  // Presentation accent (section headings + skill chips), used by both templates.
+  // `.prefault({})` runs an empty object through the schema so `accent` gets its
+  // default, instead of storing a literal `{}` with an undefined accent.
+  theme: themeSchema.prefault({}),
   // Sidebar-only: ignored by the Classic (single-column) template.
   sidebarColumns: sidebarColumnsSchema.default(DEFAULT_SIDEBAR_COLUMNS),
   // `.prefault` (not `.default`) so a missing `contact` is run through the

@@ -12,6 +12,9 @@ describe("resumeContentSchema", () => {
 
     expect(result).toEqual({
       template: "classic",
+      theme: {
+        accent: "#2a6cf0",
+      },
       sidebarColumns: {
         left: ["contact", "education", "interests", "certifications"],
         right: ["summary", "experience", "skills", "projects", "languages"],
@@ -40,6 +43,18 @@ describe("resumeContentSchema", () => {
     expect(resumeContentSchema.parse({}).template).toBe("classic");
     expect(resumeContentSchema.parse({ template: "sidebar" }).template).toBe("sidebar");
     expect(resumeContentSchema.safeParse({ template: "fancy" }).success).toBe(false);
+  });
+
+  it("defaults the accent, accepts a valid hex, and falls back on a bad one", () => {
+    // Missing theme → default accent (a legacy blob has no theme key).
+    expect(resumeContentSchema.parse({}).theme.accent).toBe("#2a6cf0");
+    // A valid 6-digit hex is kept.
+    expect(resumeContentSchema.parse({ theme: { accent: "#0f766e" } }).theme.accent).toBe("#0f766e");
+    // A malformed value must not fail the whole parse (autosave would break);
+    // `.catch` falls back to the default instead.
+    expect(resumeContentSchema.parse({ theme: { accent: "not-a-color" } }).theme.accent).toBe(
+      "#2a6cf0",
+    );
   });
 
   it("parses a legacy blob that predates the new keys", () => {

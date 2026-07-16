@@ -9,6 +9,7 @@ import { saveDraft } from "@/lib/actions/resume";
 import { resumeContentSchema, type ResumeContent } from "@/lib/schemas/resume";
 
 import { CertificationsSection } from "./certifications-section";
+import { AppearanceSection } from "./appearance-section";
 import { ContactSection } from "./contact-section";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
@@ -163,6 +164,7 @@ export const ResumeEditor = forwardRef<
     <FormProvider {...methods}>
       <div className={styles.stack} onBlurCapture={handleBlurCapture}>
         <ContactSection />
+        <AppearanceSection />
         {template === "sidebar" ? <LayoutSection /> : null}
         <SummarySection />
         <ExperienceSection />
