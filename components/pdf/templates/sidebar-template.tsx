@@ -8,13 +8,13 @@ import {
   type SidebarSectionKey,
 } from "@/lib/schemas/resume";
 
-import { BulletList, displayName, formatRange } from "./shared";
+import { BulletList, displayName, formatRange, scaleStyleSheet } from "./shared";
 
 const INK = "#333333";
 const MUTED = "#555555";
 const RULE = "#bbbbbb";
 
-const styles = StyleSheet.create({
+const baseStyles = StyleSheet.create({
   page: {
     fontSize: 9.5,
     color: INK,
@@ -121,10 +121,12 @@ const styles = StyleSheet.create({
 function SidebarSectionTitle({
   children,
   accent,
+  styles,
   first,
 }: {
   children: string;
   accent: string;
+  styles: typeof baseStyles;
   first?: boolean;
 }) {
   return (
@@ -140,6 +142,7 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
   const { contact } = content;
   const accent = content.theme.accent;
   const fontFamily = content.theme.fontFamily;
+  const styles = scaleStyleSheet(baseStyles, content.theme.density);
   const contactRows: { label: string; value: string }[] = [
     { label: "Phone: ", value: contact.phone },
     { label: "E-mail: ", value: contact.email },
@@ -248,7 +251,7 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
     const present = keys.filter((key) => bodies[key] != null);
     return present.map((key, index) => (
       <View key={key}>
-        <SidebarSectionTitle accent={accent} first={index === 0}>
+        <SidebarSectionTitle accent={accent} styles={styles} first={index === 0}>
           {SIDEBAR_SECTION_LABELS[key]}
         </SidebarSectionTitle>
         {bodies[key]}

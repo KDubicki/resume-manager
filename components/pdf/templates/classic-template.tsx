@@ -3,9 +3,16 @@ import { Children } from "react";
 
 import type { ResumeContent } from "@/lib/schemas/resume";
 
-import { BulletList, contactParts, displayName, formatRange, groupByCompany } from "./shared";
+import {
+  BulletList,
+  contactParts,
+  displayName,
+  formatRange,
+  groupByCompany,
+  scaleStyleSheet,
+} from "./shared";
 
-const styles = StyleSheet.create({
+const baseStyles = StyleSheet.create({
   page: {
     fontSize: 10.5,
     color: "#1a1a1a",
@@ -114,10 +121,12 @@ const styles = StyleSheet.create({
 function Section({
   title,
   accent,
+  styles,
   children,
 }: {
   title: React.ReactNode;
   accent: string;
+  styles: typeof baseStyles;
   children: React.ReactNode;
 }) {
   const items = Children.toArray(children);
@@ -140,6 +149,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
   const { contact } = content;
   const accent = content.theme.accent;
   const fontFamily = content.theme.fontFamily;
+  const styles = scaleStyleSheet(baseStyles, content.theme.density);
   const parts = contactParts(contact);
 
   return (
@@ -151,13 +161,13 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       {parts.length > 0 ? <Text style={styles.contactLine}>{parts.join("  ·  ")}</Text> : null}
 
       {content.summary.trim() ? (
-        <Section title="Summary" accent={accent}>
+        <Section title="Summary" accent={accent} styles={styles}>
           <Text style={styles.paragraph}>{content.summary}</Text>
         </Section>
       ) : null}
 
       {content.experience.length > 0 ? (
-        <Section title="Experience" accent={accent}>
+        <Section title="Experience" accent={accent} styles={styles}>
           {groupByCompany(content.experience).map((group, groupIndex) => {
             const first = group.entries[0]!;
             const last = group.entries[group.entries.length - 1]!;
@@ -188,7 +198,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.education.length > 0 ? (
-        <Section title="Education" accent={accent}>
+        <Section title="Education" accent={accent} styles={styles}>
           {content.education.map((entry) => (
             <View key={entry.id} style={styles.entry} wrap={false}>
               <View style={styles.entryHeaderRow}>
@@ -208,7 +218,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.projects.length > 0 ? (
-        <Section title="Projects" accent={accent}>
+        <Section title="Projects" accent={accent} styles={styles}>
           {content.projects.map((project) => (
             <View key={project.id} style={styles.entry} wrap={false}>
               <Text style={styles.entryTitle}>{project.name}</Text>
@@ -222,7 +232,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.skillGroups.length > 0 ? (
-        <Section title="Skills" accent={accent}>
+        <Section title="Skills" accent={accent} styles={styles}>
           {content.skillGroups.map((group) => (
             <View key={group.id} style={styles.skillGroup} wrap={false}>
               {group.category.trim() ? (
@@ -241,7 +251,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.languages.length > 0 ? (
-        <Section title="Languages" accent={accent}>
+        <Section title="Languages" accent={accent} styles={styles}>
           <Text style={styles.paragraph}>
             {content.languages
               .map((lang) => (lang.proficiency ? `${lang.name} (${lang.proficiency})` : lang.name))
@@ -251,7 +261,7 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       ) : null}
 
       {content.certifications.length > 0 ? (
-        <Section title="Certifications & Courses" accent={accent}>
+        <Section title="Certifications & Courses" accent={accent} styles={styles}>
           {content.certifications.map((cert) => (
             <View key={cert.id} style={styles.bullet}>
               <Text style={styles.bulletDot}>{"•"}</Text>

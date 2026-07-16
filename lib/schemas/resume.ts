@@ -157,6 +157,20 @@ export const FONT_FAMILY_LABELS: Record<FontFamily, string> = {
   Tinos: "Tinos (serif)",
 };
 
+// Text density: scales font sizes and spacing in both templates so the same
+// content can be tightened onto one page or opened up for readability. The
+// numeric factors live with the templates (see scaleStyleSheet in
+// templates/shared.tsx); this enum is just the selected level.
+export const DENSITIES = ["compact", "normal", "relaxed"] as const;
+export type Density = (typeof DENSITIES)[number];
+export const DEFAULT_DENSITY: Density = "normal";
+
+export const DENSITY_LABELS: Record<Density, string> = {
+  compact: "Compact",
+  normal: "Normal",
+  relaxed: "Relaxed",
+};
+
 export const themeSchema = z.object({
   accent: z
     .string()
@@ -167,6 +181,7 @@ export const themeSchema = z.object({
   // removed later), so an old blob never fails validation or renders in a font
   // that isn't registered.
   fontFamily: z.enum(FONT_FAMILIES).catch(DEFAULT_FONT_FAMILY).default(DEFAULT_FONT_FAMILY),
+  density: z.enum(DENSITIES).catch(DEFAULT_DENSITY).default(DEFAULT_DENSITY),
 });
 
 export type ResumeTheme = z.infer<typeof themeSchema>;

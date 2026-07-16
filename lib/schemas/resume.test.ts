@@ -15,6 +15,7 @@ describe("resumeContentSchema", () => {
       theme: {
         accent: "#2a6cf0",
         fontFamily: "Roboto",
+        density: "normal",
       },
       sidebarColumns: {
         left: ["contact", "education", "interests", "certifications"],
@@ -68,6 +69,14 @@ describe("resumeContentSchema", () => {
     expect(resumeContentSchema.parse({ theme: { fontFamily: "Comic Sans" } }).theme.fontFamily).toBe(
       "Roboto",
     );
+  });
+
+  it("defaults the density, accepts a known level, and falls back on an unknown one", () => {
+    expect(resumeContentSchema.parse({}).theme.density).toBe("normal");
+    expect(resumeContentSchema.parse({ theme: { density: "compact" } }).theme.density).toBe(
+      "compact",
+    );
+    expect(resumeContentSchema.parse({ theme: { density: "tiny" } }).theme.density).toBe("normal");
   });
 
   it("parses a legacy blob that predates the new keys", () => {

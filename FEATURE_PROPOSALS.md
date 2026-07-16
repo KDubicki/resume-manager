@@ -81,8 +81,8 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
   _Gdzie:_ `lib/schemas/resume.ts`, `components/pdf/templates/*`, `components/editor/appearance-section.tsx`. _Rozmiar:_ S.
 - [x] **[TP-2] Wybór czcionki** — 2–3 osadzone kroje ATS-safe (Roboto, Lato, Tinos serif). ✅ zrobione
   _Gdzie:_ `components/pdf/register-fonts.ts`, `lib/schemas/resume.ts`, szablony, `appearance-section.tsx`. _Rozmiar:_ M.
-- [ ] **[TP-3] Gęstość / rozmiar tekstu** — „compact / normal / relaxed" (skala paddingów i fontSize).
-  _Gdzie:_ szablony. _Rozmiar:_ S.
+- [x] **[TP-3] Gęstość / rozmiar tekstu** — „compact / normal / relaxed" (skala paddingów i fontSize). ✅ zrobione
+  _Gdzie:_ `lib/schemas/resume.ts`, `components/pdf/templates/shared.tsx` (`scaleStyleSheet`), szablony, `appearance-section.tsx`. _Rozmiar:_ S.
 - [ ] **[TP-4] Widoczność sekcji (toggle)** — ukryj sekcję bez kasowania danych (`content` flaga per sekcja).
   _Gdzie:_ schema + edytor + szablony. _Rozmiar:_ M.
 - [ ] **[TP-5] Kolejność sekcji w Classic** — analogicznie do Sidebara (`sidebarColumns`), lista kolejności dla Classic.

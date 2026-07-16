@@ -1,11 +1,62 @@
 import { Text, View } from "@react-pdf/renderer";
 import type { ComponentProps } from "react";
 
-import type { Contact } from "@/lib/schemas/resume";
+import type { Contact, Density } from "@/lib/schemas/resume";
 
 // The style shape @react-pdf accepts, taken straight from View's own prop type
 // so we don't depend on @react-pdf/types resolving under pnpm's nesting.
 type PdfStyle = ComponentProps<typeof View>["style"];
+
+// How much each density level scales font sizes and spacing. `normal` is the
+// unscaled reference (factor 1); compact tightens, relaxed opens up.
+const DENSITY_FACTORS: Record<Density, number> = {
+  compact: 0.85,
+  normal: 1,
+  relaxed: 1.15,
+};
+
+// Only size/spacing props are scaled. Ratios (lineHeight), rules (borderWidth),
+// corner radii, fixed rail widths and letter-spacing are left crisp so density
+// changes overall size + whitespace without distorting proportions.
+const SCALED_PROPS = new Set([
+  "fontSize",
+  "marginTop",
+  "marginBottom",
+  "marginVertical",
+  "marginHorizontal",
+  "marginLeft",
+  "marginRight",
+  "paddingTop",
+  "paddingBottom",
+  "paddingVertical",
+  "paddingHorizontal",
+  "paddingLeft",
+  "paddingRight",
+  "gap",
+]);
+
+// Returns a copy of a StyleSheet with size/spacing values multiplied by the
+// density factor. Non-numeric values (e.g. the sidebar's "34%" width) and
+// non-scaled props pass through untouched. Cheap enough to run per render.
+export function scaleStyleSheet<T extends Record<string, Record<string, unknown>>>(
+  styles: T,
+  density: Density,
+): T {
+  const factor = DENSITY_FACTORS[density];
+  if (factor === 1) return styles;
+  const out: Record<string, Record<string, unknown>> = {};
+  for (const [name, style] of Object.entries(styles)) {
+    const next: Record<string, unknown> = {};
+    for (const [prop, value] of Object.entries(style)) {
+      next[prop] =
+        typeof value === "number" && SCALED_PROPS.has(prop)
+          ? Math.round(value * factor * 100) / 100
+          : value;
+    }
+    out[name] = next;
+  }
+  return out as T;
+}
 
 // A resume date range. `current` overrides any endDate with "Present"; an
 // empty endDate on a non-current entry renders as an em dash rather than a
