@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { NewResumeButton } from "@/components/dashboard/new-resume-button";
 import { ResumeList } from "@/components/dashboard/resume-list";
+import { computeCompleteness } from "@/lib/ats/completeness";
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
 import { resumeContentSchema } from "@/lib/schemas/resume";
@@ -17,9 +18,12 @@ const TEMPLATE_LABEL: Record<string, string> = {
   sidebar: "Sidebar",
 };
 
-function templateOf(content: unknown): string {
+// Parse once per resume so both the template badge and the completeness meter
+// read from the same validated content (falling back to an empty resume if a
+// stored blob somehow fails validation).
+function parseContent(content: unknown) {
   const parsed = resumeContentSchema.safeParse(content);
-  return parsed.success ? parsed.data.template : "classic";
+  return parsed.success ? parsed.data : resumeContentSchema.parse({});
 }
 
 const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
@@ -65,13 +69,14 @@ export default async function DashboardPage() {
       ) : (
         <ResumeList
           resumes={resumes.map((resume) => {
-            const template = templateOf(resume.content);
+            const content = parseContent(resume.content);
             return {
               id: resume.id,
               title: resume.title,
-              templateLabel: TEMPLATE_LABEL[template] ?? template,
+              templateLabel: TEMPLATE_LABEL[content.template] ?? content.template,
               updatedAt: resume.updatedAt.getTime(),
               updatedLabel: dateFormat.format(resume.updatedAt),
+              completeness: computeCompleteness(content).percent,
             };
           })}
         />

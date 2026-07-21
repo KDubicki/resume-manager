@@ -12,6 +12,7 @@ import { CertificationsSection } from "./certifications-section";
 import { AppearanceSection } from "./appearance-section";
 import { ClassicOrderSection } from "./classic-order-section";
 import { ContactSection } from "./contact-section";
+import { EditorCompleteness } from "./editor-completeness";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
 import { InterestsSection } from "./interests-section";
@@ -165,6 +166,7 @@ export const ResumeEditor = forwardRef<
   return (
     <FormProvider {...methods}>
       <div className={styles.stack} onBlurCapture={handleBlurCapture}>
+        <EditorCompleteness />
         <ContactSection />
         <AppearanceSection />
         <SectionsVisibility />

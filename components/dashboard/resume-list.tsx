@@ -14,6 +14,7 @@ export type ResumeListItem = {
   templateLabel: string;
   updatedAt: number;
   updatedLabel: string;
+  completeness: number;
 };
 
 type SortKey = "updated-desc" | "updated-asc" | "title-asc" | "title-desc" | "template";
@@ -37,8 +38,7 @@ function sortResumes(resumes: ResumeListItem[], sort: SortKey): ResumeListItem[]
       return sorted.sort((a, b) => b.title.localeCompare(a.title));
     case "template":
       return sorted.sort(
-        (a, b) =>
-          a.templateLabel.localeCompare(b.templateLabel) || a.title.localeCompare(b.title),
+        (a, b) => a.templateLabel.localeCompare(b.templateLabel) || a.title.localeCompare(b.title),
       );
     case "updated-desc":
     default:
@@ -94,6 +94,7 @@ export function ResumeList({ resumes }: { resumes: ResumeListItem[] }) {
               title={resume.title}
               templateLabel={resume.templateLabel}
               updatedLabel={resume.updatedLabel}
+              completeness={resume.completeness}
             />
           ))}
         </div>

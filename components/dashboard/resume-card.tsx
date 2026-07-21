@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CompletenessBar } from "@/components/completeness-meter";
 import { deleteResume, duplicateResume, saveTitle } from "@/lib/actions/resume";
 
 import styles from "./resume-card.module.css";
@@ -15,11 +16,13 @@ export function ResumeCard({
   title,
   templateLabel,
   updatedLabel,
+  completeness,
 }: {
   id: string;
   title: string;
   templateLabel: string;
   updatedLabel: string;
+  completeness: number;
 }) {
   const router = useRouter();
   const { message } = App.useApp();
@@ -134,6 +137,7 @@ export function ResumeCard({
         <span className={styles.badge}>{templateLabel}</span>
         <h2 className={styles.cardTitle}>{title}</h2>
         <div className={styles.cardMeta}>Updated {updatedLabel}</div>
+        <CompletenessBar percent={completeness} />
       </Link>
       <div className={styles.cardActions}>
         <Tooltip title="Rename">
