@@ -10,6 +10,7 @@ import { resumeContentSchema, type ResumeContent } from "@/lib/schemas/resume";
 
 import { CertificationsSection } from "./certifications-section";
 import { AppearanceSection } from "./appearance-section";
+import { ClassicOrderSection } from "./classic-order-section";
 import { ContactSection } from "./contact-section";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
@@ -168,6 +169,7 @@ export const ResumeEditor = forwardRef<
         <AppearanceSection />
         <SectionsVisibility />
         {template === "sidebar" ? <LayoutSection /> : null}
+        {template === "classic" ? <ClassicOrderSection /> : null}
         <SummarySection />
         <ExperienceSection />
         <EducationSection />

@@ -1,7 +1,11 @@
 import { Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import { Children } from "react";
+import { Children, Fragment, type ReactNode } from "react";
 
-import type { ResumeContent } from "@/lib/schemas/resume";
+import {
+  normalizeClassicOrder,
+  type ClassicSectionKey,
+  type ResumeContent,
+} from "@/lib/schemas/resume";
 
 import {
   BulletList,
@@ -153,6 +157,118 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
   const hidden = new Set(content.hiddenSections);
   const parts = contactParts(contact);
 
+  // Each section's rendered block, or null when it has no content. The order
+  // array below decides sequence; the same block renders identically wherever
+  // it lands, so reordering is purely which position it appears in.
+  const sectionNodes: Record<ClassicSectionKey, ReactNode> = {
+    summary: content.summary.trim() ? (
+      <Section title="Summary" accent={accent} styles={styles}>
+        <Text style={styles.paragraph}>{content.summary}</Text>
+      </Section>
+    ) : null,
+    experience: content.experience.length > 0 ? (
+      <Section title="Experience" accent={accent} styles={styles}>
+        {groupByCompany(content.experience).map((group, groupIndex) => {
+          const first = group.entries[0]!;
+          const last = group.entries[group.entries.length - 1]!;
+          return (
+            <View key={groupIndex} style={styles.entry}>
+              <View style={styles.companyRow}>
+                <Text style={styles.companyName}>{group.company}</Text>
+                <Text style={styles.entryMeta}>
+                  {formatRange(last.startDate, first.endDate, first.current)}
+                </Text>
+              </View>
+              {group.entries.map((entry) => (
+                <View key={entry.id} style={{ marginTop: 4 }} wrap={false}>
+                  <View style={styles.entryHeaderRow}>
+                    <Text style={styles.entryTitle}>{entry.role}</Text>
+                    <Text style={styles.entryMeta}>
+                      {formatRange(entry.startDate, entry.endDate, entry.current)}
+                    </Text>
+                  </View>
+                  {entry.location ? <Text style={styles.entryMeta}>{entry.location}</Text> : null}
+                  <BulletList items={entry.highlights} styles={styles} />
+                </View>
+              ))}
+            </View>
+          );
+        })}
+      </Section>
+    ) : null,
+    education: content.education.length > 0 ? (
+      <Section title="Education" accent={accent} styles={styles}>
+        {content.education.map((entry) => (
+          <View key={entry.id} style={styles.entry} wrap={false}>
+            <View style={styles.entryHeaderRow}>
+              <Text style={styles.entryTitle}>{entry.institution}</Text>
+              <Text style={styles.entryMeta}>
+                {formatRange(entry.startDate, entry.endDate, entry.current)}
+              </Text>
+            </View>
+            <Text style={styles.entryTitle}>
+              {entry.degree}
+              {entry.fieldOfStudy ? ` · ${entry.fieldOfStudy}` : ""}
+            </Text>
+            {entry.description ? <Text style={styles.paragraph}>{entry.description}</Text> : null}
+          </View>
+        ))}
+      </Section>
+    ) : null,
+    projects: content.projects.length > 0 ? (
+      <Section title="Projects" accent={accent} styles={styles}>
+        {content.projects.map((project) => (
+          <View key={project.id} style={styles.entry} wrap={false}>
+            <Text style={styles.entryTitle}>{project.name}</Text>
+            {project.description ? (
+              <Text style={{ marginBottom: 2 }}>{project.description}</Text>
+            ) : null}
+            <BulletList items={project.highlights} styles={styles} />
+          </View>
+        ))}
+      </Section>
+    ) : null,
+    skills: content.skillGroups.length > 0 ? (
+      <Section title="Skills" accent={accent} styles={styles}>
+        {content.skillGroups.map((group) => (
+          <View key={group.id} style={styles.skillGroup} wrap={false}>
+            {group.category.trim() ? (
+              <Text style={[styles.skillGroupLabel, { color: accent }]}>{group.category}</Text>
+            ) : null}
+            <View style={styles.chipRow}>
+              {group.skills.map((skill, index) => (
+                <Text key={index} style={[styles.chip, { borderColor: accent, color: accent }]}>
+                  {skill}
+                </Text>
+              ))}
+            </View>
+          </View>
+        ))}
+      </Section>
+    ) : null,
+    languages: content.languages.length > 0 ? (
+      <Section title="Languages" accent={accent} styles={styles}>
+        <Text style={styles.paragraph}>
+          {content.languages
+            .map((lang) => (lang.proficiency ? `${lang.name} (${lang.proficiency})` : lang.name))
+            .join("   ·   ")}
+        </Text>
+      </Section>
+    ) : null,
+    certifications: content.certifications.length > 0 ? (
+      <Section title="Certifications & Courses" accent={accent} styles={styles}>
+        {content.certifications.map((cert) => (
+          <View key={cert.id} style={styles.bullet}>
+            <Text style={styles.bulletDot}>{"•"}</Text>
+            <Text style={styles.bulletText}>{cert.name}</Text>
+          </View>
+        ))}
+      </Section>
+    ) : null,
+  };
+
+  const order = normalizeClassicOrder(content.classicOrder);
+
   return (
     // Single column: layout reads top-to-bottom in one linear pass, so an ATS
     // parser never has to guess reading order.
@@ -161,116 +277,9 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
       {contact.headline.trim() ? <Text style={styles.headline}>{contact.headline}</Text> : null}
       {parts.length > 0 ? <Text style={styles.contactLine}>{parts.join("  ·  ")}</Text> : null}
 
-      {content.summary.trim() && !hidden.has("summary") ? (
-        <Section title="Summary" accent={accent} styles={styles}>
-          <Text style={styles.paragraph}>{content.summary}</Text>
-        </Section>
-      ) : null}
-
-      {content.experience.length > 0 && !hidden.has("experience") ? (
-        <Section title="Experience" accent={accent} styles={styles}>
-          {groupByCompany(content.experience).map((group, groupIndex) => {
-            const first = group.entries[0]!;
-            const last = group.entries[group.entries.length - 1]!;
-            return (
-              <View key={groupIndex} style={styles.entry}>
-                <View style={styles.companyRow}>
-                  <Text style={styles.companyName}>{group.company}</Text>
-                  <Text style={styles.entryMeta}>
-                    {formatRange(last.startDate, first.endDate, first.current)}
-                  </Text>
-                </View>
-                {group.entries.map((entry) => (
-                  <View key={entry.id} style={{ marginTop: 4 }} wrap={false}>
-                    <View style={styles.entryHeaderRow}>
-                      <Text style={styles.entryTitle}>{entry.role}</Text>
-                      <Text style={styles.entryMeta}>
-                        {formatRange(entry.startDate, entry.endDate, entry.current)}
-                      </Text>
-                    </View>
-                    {entry.location ? <Text style={styles.entryMeta}>{entry.location}</Text> : null}
-                    <BulletList items={entry.highlights} styles={styles} />
-                  </View>
-                ))}
-              </View>
-            );
-          })}
-        </Section>
-      ) : null}
-
-      {content.education.length > 0 && !hidden.has("education") ? (
-        <Section title="Education" accent={accent} styles={styles}>
-          {content.education.map((entry) => (
-            <View key={entry.id} style={styles.entry} wrap={false}>
-              <View style={styles.entryHeaderRow}>
-                <Text style={styles.entryTitle}>{entry.institution}</Text>
-                <Text style={styles.entryMeta}>
-                  {formatRange(entry.startDate, entry.endDate, entry.current)}
-                </Text>
-              </View>
-              <Text style={styles.entryTitle}>
-                {entry.degree}
-                {entry.fieldOfStudy ? ` · ${entry.fieldOfStudy}` : ""}
-              </Text>
-              {entry.description ? <Text style={styles.paragraph}>{entry.description}</Text> : null}
-            </View>
-          ))}
-        </Section>
-      ) : null}
-
-      {content.projects.length > 0 && !hidden.has("projects") ? (
-        <Section title="Projects" accent={accent} styles={styles}>
-          {content.projects.map((project) => (
-            <View key={project.id} style={styles.entry} wrap={false}>
-              <Text style={styles.entryTitle}>{project.name}</Text>
-              {project.description ? (
-                <Text style={{ marginBottom: 2 }}>{project.description}</Text>
-              ) : null}
-              <BulletList items={project.highlights} styles={styles} />
-            </View>
-          ))}
-        </Section>
-      ) : null}
-
-      {content.skillGroups.length > 0 && !hidden.has("skills") ? (
-        <Section title="Skills" accent={accent} styles={styles}>
-          {content.skillGroups.map((group) => (
-            <View key={group.id} style={styles.skillGroup} wrap={false}>
-              {group.category.trim() ? (
-                <Text style={[styles.skillGroupLabel, { color: accent }]}>{group.category}</Text>
-              ) : null}
-              <View style={styles.chipRow}>
-                {group.skills.map((skill, index) => (
-                  <Text key={index} style={[styles.chip, { borderColor: accent, color: accent }]}>
-                    {skill}
-                  </Text>
-                ))}
-              </View>
-            </View>
-          ))}
-        </Section>
-      ) : null}
-
-      {content.languages.length > 0 && !hidden.has("languages") ? (
-        <Section title="Languages" accent={accent} styles={styles}>
-          <Text style={styles.paragraph}>
-            {content.languages
-              .map((lang) => (lang.proficiency ? `${lang.name} (${lang.proficiency})` : lang.name))
-              .join("   ·   ")}
-          </Text>
-        </Section>
-      ) : null}
-
-      {content.certifications.length > 0 && !hidden.has("certifications") ? (
-        <Section title="Certifications & Courses" accent={accent} styles={styles}>
-          {content.certifications.map((cert) => (
-            <View key={cert.id} style={styles.bullet}>
-              <Text style={styles.bulletDot}>{"•"}</Text>
-              <Text style={styles.bulletText}>{cert.name}</Text>
-            </View>
-          ))}
-        </Section>
-      ) : null}
+      {order.map((key) =>
+        hidden.has(key) ? null : <Fragment key={key}>{sectionNodes[key]}</Fragment>,
+      )}
     </Page>
   );
 }

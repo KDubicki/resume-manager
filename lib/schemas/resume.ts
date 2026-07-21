@@ -163,6 +163,39 @@ export function normalizeSidebarColumns(columns: SidebarColumns): SidebarColumns
   return { left: columns.left, right: [...columns.right, ...missing] };
 }
 
+// The sections the Classic (single-column) template renders, in their default
+// top-to-bottom order. Contact is the header (always first) and interests is
+// Sidebar-only, so neither is orderable here.
+export const CLASSIC_SECTIONS = [
+  "summary",
+  "experience",
+  "education",
+  "projects",
+  "skills",
+  "languages",
+  "certifications",
+] as const;
+
+export type ClassicSectionKey = (typeof CLASSIC_SECTIONS)[number];
+
+export const DEFAULT_CLASSIC_ORDER: ClassicSectionKey[] = [...CLASSIC_SECTIONS];
+
+// Mirrors normalizeSidebarColumns: de-dupes and appends any section missing
+// from a saved order (e.g. a resume written before a section existed) so it
+// still renders and still appears in the ordering editor.
+export function normalizeClassicOrder(order: ClassicSectionKey[]): ClassicSectionKey[] {
+  const seen = new Set<ClassicSectionKey>();
+  const deduped: ClassicSectionKey[] = [];
+  for (const key of order) {
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduped.push(key);
+    }
+  }
+  const missing = CLASSIC_SECTIONS.filter((key) => !seen.has(key));
+  return [...deduped, ...missing];
+}
+
 // A single accent color (6-digit hex) applied to section headings and skill
 // chips in both templates. `.catch` falls back to the default rather than
 // failing validation, so a malformed value — e.g. a half-typed hex during a
@@ -225,6 +258,10 @@ export const resumeContentSchema = z.object({
   // only the rendered PDF skips it. `.catch([])` drops the whole array if it's
   // malformed rather than failing the parse, so a bad value never blocks a save.
   hiddenSections: z.array(z.enum(TOGGLEABLE_SECTIONS)).catch([]).default([]),
+  // Classic-only section order; ignored by the Sidebar template. Malformed
+  // values `.catch([])` and are backfilled to the full default order by
+  // normalizeClassicOrder at render time.
+  classicOrder: z.array(z.enum(CLASSIC_SECTIONS)).catch([]).default(DEFAULT_CLASSIC_ORDER),
   // Sidebar-only: ignored by the Classic (single-column) template.
   sidebarColumns: sidebarColumnsSchema.default(DEFAULT_SIDEBAR_COLUMNS),
   // `.prefault` (not `.default`) so a missing `contact` is run through the

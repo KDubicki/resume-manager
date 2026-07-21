@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   defaultResumeContent,
+  normalizeClassicOrder,
   normalizeSidebarColumns,
   resumeContentSchema,
 } from "./resume";
@@ -18,6 +19,15 @@ describe("resumeContentSchema", () => {
         density: "normal",
       },
       hiddenSections: [],
+      classicOrder: [
+        "summary",
+        "experience",
+        "education",
+        "projects",
+        "skills",
+        "languages",
+        "certifications",
+      ],
       sidebarColumns: {
         left: ["contact", "education", "interests", "certifications"],
         right: ["summary", "experience", "skills", "projects", "languages"],
@@ -88,6 +98,40 @@ describe("resumeContentSchema", () => {
     // A malformed array (unknown key) `.catch`es to [] rather than failing the
     // whole parse, so a bad value never blocks autosave.
     expect(resumeContentSchema.parse({ hiddenSections: ["bogus"] }).hiddenSections).toEqual([]);
+  });
+
+  it("keeps a custom classicOrder and drops a malformed one", () => {
+    const custom = ["skills", "experience", "summary"];
+    expect(
+      resumeContentSchema.parse({ classicOrder: custom }).classicOrder,
+    ).toEqual(custom);
+    // An unknown key makes the whole array `.catch([])`; render-time normalize
+    // then backfills the full default order.
+    expect(resumeContentSchema.parse({ classicOrder: ["bogus"] }).classicOrder).toEqual([]);
+  });
+
+  it("normalizeClassicOrder de-dupes and appends missing sections", () => {
+    // A partial, duplicated order: keep first occurrence, then append the rest
+    // in default order so nothing is lost.
+    expect(normalizeClassicOrder(["skills", "skills", "summary"])).toEqual([
+      "skills",
+      "summary",
+      "experience",
+      "education",
+      "projects",
+      "languages",
+      "certifications",
+    ]);
+    // An empty order (the `.catch([])` case) yields the full default order.
+    expect(normalizeClassicOrder([])).toEqual([
+      "summary",
+      "experience",
+      "education",
+      "projects",
+      "skills",
+      "languages",
+      "certifications",
+    ]);
   });
 
   it("parses a legacy blob that predates the new keys", () => {
