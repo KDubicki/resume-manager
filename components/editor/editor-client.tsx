@@ -6,8 +6,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { TopBar } from "@/components/app-shell/top-bar";
 import { WorkbenchShell } from "@/components/app-shell/workbench-shell";
-import { ResumeEditor, type ResumeEditorHandle, type SaveState } from "@/components/editor/resume-editor";
+import {
+  ResumeEditor,
+  type ResumeEditorHandle,
+  type SaveState,
+} from "@/components/editor/resume-editor";
 import { AtsLens } from "@/components/pdf/ats-lens";
+import { JobDescriptionPanel } from "@/components/pdf/job-description-panel";
 import { LivePreview } from "@/components/pdf/live-preview";
 import { saveTitle } from "@/lib/actions/resume";
 import type { ResumeContent } from "@/lib/schemas/resume";
@@ -36,6 +41,9 @@ export function EditorClient({
   // Seeded with the persisted content (not defaults) so the preview is correct
   // on first paint, before the user touches anything.
   const [previewContent, setPreviewContent] = useState<ResumeContent>(initialValues);
+  // Job description to target the resume against. Deliberately local-only: it
+  // never enters `content` (or the DB), and later drives ATS keyword matching.
+  const [jobDescription, setJobDescription] = useState("");
   const [exporting, setExporting] = useState(false);
   const editorRef = useRef<ResumeEditorHandle>(null);
 
@@ -139,6 +147,7 @@ export function EditorClient({
           <div className={styles.previewStack}>
             <LivePreview title={title} content={previewContent} />
             <AtsLens content={previewContent} />
+            <JobDescriptionPanel value={jobDescription} onChange={setJobDescription} />
           </div>
         }
         onExport={() => void handleExport()}
