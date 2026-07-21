@@ -146,7 +146,7 @@ export function EditorClient({
         preview={
           <div className={styles.previewStack}>
             <LivePreview title={title} content={previewContent} />
-            <AtsLens content={previewContent} />
+            <AtsLens content={previewContent} jobDescription={jobDescription} />
             <JobDescriptionPanel value={jobDescription} onChange={setJobDescription} />
           </div>
         }

@@ -1,10 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { matchKeywords } from "@/lib/ats/keywords";
 import type { ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./ats-lens.module.css";
+
+// Below this share of matched JD keywords the check warns rather than passes —
+// a resume echoing under ~60% of what the posting emphasizes is a real ATS risk.
+const KEYWORD_PASS_RATIO = 0.6;
+
+// The missing list is guidance, not an exhaustive dump; showing the top handful
+// (already frequency-ranked) keeps it actionable and the panel compact.
+const MAX_MISSING_SHOWN = 12;
 
 function detectSections(content: ResumeContent): string[] {
   return [
@@ -48,13 +57,34 @@ function Row({
   );
 }
 
-export function AtsLens({ content }: { content: ResumeContent }) {
+export function AtsLens({
+  content,
+  jobDescription = "",
+}: {
+  content: ResumeContent;
+  jobDescription?: string;
+}) {
   const [expanded, setExpanded] = useState(false);
   const sections = detectSections(content);
   // The Sidebar template is a deliberate two-column layout: an honest ATS
   // parser can interleave the two rails, so we flag it rather than hide it.
   // Classic stays a single linear pass.
   const isMultiColumn = content.template === "sidebar";
+
+  // Keyword matching (ATS-2) only runs when a job description has been pasted
+  // (ATS-1). Memoized because tokenizing the whole resume + JD on every preview
+  // re-render would be wasteful.
+  const hasJd = jobDescription.trim().length > 0;
+  const keywords = useMemo(
+    () => (hasJd ? matchKeywords(jobDescription, content) : null),
+    [hasJd, jobDescription, content],
+  );
+  const keywordsStatus: "pass" | "warn" | "pending" =
+    !keywords || keywords.total === 0
+      ? "pending"
+      : keywords.matched.length / keywords.total >= KEYWORD_PASS_RATIO
+        ? "pass"
+        : "warn";
 
   return (
     <div className={styles.lens}>
@@ -86,6 +116,32 @@ export function AtsLens({ content }: { content: ResumeContent }) {
           status={sections.length > 0 ? "pass" : "pending"}
         />
         <Row label="Fonts" value="Roboto (embed)" status="info" />
+        {keywords && keywords.total > 0 && (
+          <>
+            <Row
+              label="Keywords"
+              value={`${keywords.matched.length} / ${keywords.total} matched`}
+              status={keywordsStatus}
+            />
+            {keywords.missing.length > 0 && (
+              <div className={styles.missing}>
+                <div className={styles.missingLabel}>Missing from resume</div>
+                <div className={styles.missingList}>
+                  {keywords.missing.slice(0, MAX_MISSING_SHOWN).map((term) => (
+                    <span key={term} className={styles.tag}>
+                      {term}
+                    </span>
+                  ))}
+                  {keywords.missing.length > MAX_MISSING_SHOWN && (
+                    <span className={styles.tagMore}>
+                      +{keywords.missing.length - MAX_MISSING_SHOWN} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

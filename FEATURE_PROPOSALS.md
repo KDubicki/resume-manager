@@ -51,7 +51,7 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
 
 - [x] **[ATS-1] Wklejenie opisu oferty (JD)** — pole tekstowe „Paste job description". ✅ zrobione
   _Gdzie:_ nowy panel obok ATS Lens; stan lokalny (nie musi trafiać do `content`). _Rozmiar:_ S.
-- [ ] **[ATS-2] Dopasowanie słów kluczowych** — ekstrakcja keywords z JD i porównanie z treścią CV; lista „brakujących".
+- [x] **[ATS-2] Dopasowanie słów kluczowych** — ekstrakcja keywords z JD i porównanie z treścią CV; lista „brakujących". ✅ zrobione
   _Dlaczego:_ realny sygnał ATS zamiast tylko „ile sekcji". _Gdzie:_ `components/pdf/ats-lens.tsx` + `lib/ats/` (proste NLP, bez zewnętrznego API). _Rozmiar:_ M. _Zależy:_ ATS-1.
 - [ ] **[ATS-3] Wynik gotowości (ATS score 0–100)** — heurystyki: sekcje, długość, słowa kluczowe, kolumny.
   _Gdzie:_ `lib/ats/score.ts` + wizualizacja (meter). _Rozmiar:_ M. _Zależy:_ ATS-2.
