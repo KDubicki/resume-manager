@@ -94,7 +94,7 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
 
 ## 7. Edytor — UX
 
-- [ ] **[UX-1] Drag & drop kolejności wpisów** — reorder experience/education/projects (dziś brak reorderu w listach).
+- [x] **[UX-1] Drag & drop kolejności wpisów** — reorder experience/education/projects (dziś brak reorderu w listach). ✅ zrobione
   _Gdzie:_ sekcje edytora (dnd-kit lub natywne). _Rozmiar:_ M.
 - [ ] **[UX-2] Zwijanie/rozwijanie i „skocz do sekcji"** — nawigacja boczna po sekcjach.
   _Gdzie:_ `resume-editor.tsx`, `section-card.tsx`. _Rozmiar:_ S.

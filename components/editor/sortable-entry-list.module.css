@@ -1,0 +1,52 @@
+/* Mirrors list-section.module.css .entry, but laid out as a row with a drag
+   handle so the content column keeps the same vertical field stack. */
+.entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.entry[data-dragging] {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  /* Lift the dragged card above its siblings while it moves. */
+  position: relative;
+  z-index: 1;
+}
+
+.handle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-height: 40px;
+  margin: -4px 0;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--muted-ink, #888);
+  cursor: grab;
+  touch-action: none;
+}
+
+.handle:hover {
+  color: inherit;
+}
+
+.handle:active {
+  cursor: grabbing;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  /* Let the content shrink instead of forcing the row wider than the card. */
+  min-width: 0;
+}

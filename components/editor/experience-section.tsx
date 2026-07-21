@@ -8,6 +8,7 @@ import type { ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
+import { SortableEntry, SortableEntryList } from "./sortable-entry-list";
 
 function CurrentAwareEndDate({ index }: { index: number }) {
   const { control } = useFormContext<ResumeContent>();
@@ -26,7 +27,7 @@ function CurrentAwareEndDate({ index }: { index: number }) {
 
 export function ExperienceSection() {
   const { control } = useFormContext<ResumeContent>();
-  const { fields, append, remove } = useFieldArray({ control, name: "experience" });
+  const { fields, append, remove, move } = useFieldArray({ control, name: "experience" });
 
   return (
     <SectionCard
@@ -34,80 +35,89 @@ export function ExperienceSection() {
       meta={`${fields.length} ${fields.length === 1 ? "entry" : "entries"}`}
     >
       <div className={styles.list}>
-        {fields.map((field, index) => (
-          <div key={field.id} className={styles.entry}>
-            <div className={styles.row}>
-              <Controller
-                name={`experience.${index}.role`}
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input {...field} placeholder="Role" status={fieldState.error ? "error" : undefined} />
-                )}
-              />
-              <Controller
-                name={`experience.${index}.company`}
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    placeholder="Company"
-                    status={fieldState.error ? "error" : undefined}
-                  />
-                )}
-              />
-            </div>
-            <div className={styles.row}>
-              <Controller
-                name={`experience.${index}.location`}
-                control={control}
-                render={({ field }) => <Input {...field} placeholder="Location" />}
-              />
-              <Controller
-                name={`experience.${index}.startDate`}
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Input
-                    {...field}
-                    placeholder="Start (e.g. 2021-01)"
-                    status={fieldState.error ? "error" : undefined}
-                  />
-                )}
-              />
-              <CurrentAwareEndDate index={index} />
-            </div>
-            <Controller
-              name={`experience.${index}.current`}
-              control={control}
-              render={({ field }) => (
-                <Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)}>
-                  Current role
-                </Checkbox>
-              )}
-            />
-            <Controller
-              name={`experience.${index}.highlights`}
-              control={control}
-              render={({ field }) => (
-                <Input.TextArea
-                  value={field.value.join("\n")}
-                  onChange={(e) => field.onChange(e.target.value.split("\n"))}
-                  rows={3}
-                  placeholder="One highlight per line"
+        <SortableEntryList ids={fields.map((field) => field.id)} onReorder={move}>
+          {fields.map((field, index) => (
+            <SortableEntry key={field.id} id={field.id} label={`experience ${index + 1}`}>
+              <div className={styles.row}>
+                <Controller
+                  name={`experience.${index}.role`}
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      placeholder="Role"
+                      status={fieldState.error ? "error" : undefined}
+                    />
+                  )}
                 />
-              )}
-            />
-            <div className={styles.entryFooter}>
-              <Button
-                type="text"
-                className={styles.removeButton}
-                icon={<DeleteOutlined />}
-                onClick={() => remove(index)}
-              >
-                Remove
-              </Button>
-            </div>
-          </div>
-        ))}
+                <Controller
+                  name={`experience.${index}.company`}
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      placeholder="Company"
+                      status={fieldState.error ? "error" : undefined}
+                    />
+                  )}
+                />
+              </div>
+              <div className={styles.row}>
+                <Controller
+                  name={`experience.${index}.location`}
+                  control={control}
+                  render={({ field }) => <Input {...field} placeholder="Location" />}
+                />
+                <Controller
+                  name={`experience.${index}.startDate`}
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      placeholder="Start (e.g. 2021-01)"
+                      status={fieldState.error ? "error" : undefined}
+                    />
+                  )}
+                />
+                <CurrentAwareEndDate index={index} />
+              </div>
+              <Controller
+                name={`experience.${index}.current`}
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                  >
+                    Current role
+                  </Checkbox>
+                )}
+              />
+              <Controller
+                name={`experience.${index}.highlights`}
+                control={control}
+                render={({ field }) => (
+                  <Input.TextArea
+                    value={field.value.join("\n")}
+                    onChange={(e) => field.onChange(e.target.value.split("\n"))}
+                    rows={3}
+                    placeholder="One highlight per line"
+                  />
+                )}
+              />
+              <div className={styles.entryFooter}>
+                <Button
+                  type="text"
+                  className={styles.removeButton}
+                  icon={<DeleteOutlined />}
+                  onClick={() => remove(index)}
+                >
+                  Remove
+                </Button>
+              </div>
+            </SortableEntry>
+          ))}
+        </SortableEntryList>
       </div>
       <Button
         type="dashed"
