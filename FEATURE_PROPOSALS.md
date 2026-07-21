@@ -57,7 +57,7 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
   _Gdzie:_ `lib/ats/score.ts` + wizualizacja (meter). _Rozmiar:_ M. _Zależy:_ ATS-2.
 - [x] **[ATS-4] Miernik kompletności CV** — % wypełnienia (nazwa, kontakt, ≥1 experience, itd.) na karcie i w edytorze. ✅ zrobione
   _Gdzie:_ `lib/ats/completeness.ts`. _Rozmiar:_ S.
-- [ ] **[ATS-5] Ostrzeżenia jakościowe** — puste sekcje, bullet bez czasownika, zbyt długie akapity, brak dat.
+- [x] **[ATS-5] Ostrzeżenia jakościowe** — puste sekcje, bullet bez czasownika, zbyt długie akapity, brak dat. ✅ zrobione
   _Gdzie:_ ATS Lens. _Rozmiar:_ M.
 
 ## 5. Asystent AI (Claude API)

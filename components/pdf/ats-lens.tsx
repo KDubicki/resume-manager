@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { matchKeywords } from "@/lib/ats/keywords";
+import { analyzeQuality } from "@/lib/ats/quality";
 import { scoreResume } from "@/lib/ats/score";
 import type { ResumeContent } from "@/lib/schemas/resume";
 
@@ -15,6 +16,10 @@ const KEYWORD_PASS_RATIO = 0.6;
 // The missing list is guidance, not an exhaustive dump; showing the top handful
 // (already frequency-ranked) keeps it actionable and the panel compact.
 const MAX_MISSING_SHOWN = 12;
+
+// Same rationale for quality warnings (ATS-5): show the first handful and count
+// the rest, so a rough draft doesn't bury the panel in a wall of hints.
+const MAX_WARNINGS_SHOWN = 6;
 
 function detectSections(content: ResumeContent): string[] {
   return [
@@ -92,6 +97,10 @@ export function AtsLens({
   const { score } = useMemo(() => scoreResume(content, jobDescription), [content, jobDescription]);
   const scoreBand = score >= 75 ? "good" : score >= 50 ? "fair" : "weak";
 
+  // Quality warnings (ATS-5): empty sections, weak bullets, over-long text,
+  // missing dates.
+  const warnings = useMemo(() => analyzeQuality(content), [content]);
+
   return (
     <div className={styles.lens}>
       <button
@@ -167,6 +176,26 @@ export function AtsLens({
               </div>
             )}
           </>
+        )}
+        <Row
+          label="Quality"
+          value={warnings.length === 0 ? "no issues" : `${warnings.length} to review`}
+          status={warnings.length === 0 ? "pass" : "warn"}
+        />
+        {warnings.length > 0 && (
+          <ul className={styles.warnings}>
+            {warnings.slice(0, MAX_WARNINGS_SHOWN).map((warning) => (
+              <li key={warning.key} className={styles.warning}>
+                <span className={styles.checkWarn} aria-hidden="true">
+                  ⚠
+                </span>
+                <span>{warning.message}</span>
+              </li>
+            ))}
+            {warnings.length > MAX_WARNINGS_SHOWN && (
+              <li className={styles.warningMore}>+{warnings.length - MAX_WARNINGS_SHOWN} more</li>
+            )}
+          </ul>
         )}
       </div>
     </div>
