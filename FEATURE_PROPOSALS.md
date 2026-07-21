@@ -53,7 +53,7 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
   _Gdzie:_ nowy panel obok ATS Lens; stan lokalny (nie musi trafiać do `content`). _Rozmiar:_ S.
 - [x] **[ATS-2] Dopasowanie słów kluczowych** — ekstrakcja keywords z JD i porównanie z treścią CV; lista „brakujących". ✅ zrobione
   _Dlaczego:_ realny sygnał ATS zamiast tylko „ile sekcji". _Gdzie:_ `components/pdf/ats-lens.tsx` + `lib/ats/` (proste NLP, bez zewnętrznego API). _Rozmiar:_ M. _Zależy:_ ATS-1.
-- [ ] **[ATS-3] Wynik gotowości (ATS score 0–100)** — heurystyki: sekcje, długość, słowa kluczowe, kolumny.
+- [x] **[ATS-3] Wynik gotowości (ATS score 0–100)** — heurystyki: sekcje, długość, słowa kluczowe, kolumny. ✅ zrobione
   _Gdzie:_ `lib/ats/score.ts` + wizualizacja (meter). _Rozmiar:_ M. _Zależy:_ ATS-2.
 - [ ] **[ATS-4] Miernik kompletności CV** — % wypełnienia (nazwa, kontakt, ≥1 experience, itd.) na karcie i w edytorze.
   _Gdzie:_ `lib/ats/completeness.ts`. _Rozmiar:_ S.

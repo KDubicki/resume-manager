@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { matchKeywords } from "@/lib/ats/keywords";
+import { scoreResume } from "@/lib/ats/score";
 import type { ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./ats-lens.module.css";
@@ -86,6 +87,11 @@ export function AtsLens({
         ? "pass"
         : "warn";
 
+  // Overall readiness (ATS-3). Memoized alongside the keyword match since it
+  // reuses the same tokenization pass.
+  const { score } = useMemo(() => scoreResume(content, jobDescription), [content, jobDescription]);
+  const scoreBand = score >= 75 ? "good" : score >= 50 ? "fair" : "weak";
+
   return (
     <div className={styles.lens}>
       <button
@@ -95,11 +101,31 @@ export function AtsLens({
         aria-expanded={expanded}
         aria-live="polite"
       >
-        {isMultiColumn ? "⚠" : sections.length > 0 ? "✓" : "·"} ATS · {sections.length}{" "}
+        {isMultiColumn ? "⚠" : sections.length > 0 ? "✓" : "·"} ATS {score} · {sections.length}{" "}
         {sections.length === 1 ? "section" : "sections"}
       </button>
       <div className={`font-mono ${styles.panel}`} data-expanded={expanded} aria-live="polite">
         <div className={styles.title}>ATS VIEW</div>
+        <div className={styles.meter}>
+          <div className={styles.meterHead}>
+            <span className={styles.label}>Readiness</span>
+            <span className={styles.value}>{score} / 100</span>
+          </div>
+          <div
+            className={styles.meterTrack}
+            role="meter"
+            aria-valuenow={score}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="ATS readiness score"
+          >
+            <div
+              className={styles.meterFill}
+              data-band={scoreBand}
+              style={{ width: `${score}%` }}
+            />
+          </div>
+        </div>
         {/* Text layer is a structural guarantee of every template — real Text
             nodes with an embedded font — so it's always ok. Reading order
             depends on the template: Classic is a single linear pass; Sidebar

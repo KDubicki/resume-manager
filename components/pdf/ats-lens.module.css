@@ -30,6 +30,51 @@
   opacity: 0.7;
 }
 
+.meter {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.meterHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12.5px;
+  margin-bottom: 6px;
+}
+
+.meterTrack {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-border);
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 200ms ease;
+}
+
+.meterFill[data-band="good"] {
+  background: var(--brass);
+}
+
+.meterFill[data-band="fair"] {
+  background: var(--warn-ink, #c8860a);
+}
+
+.meterFill[data-band="weak"] {
+  background: var(--error-ink, #b23a48);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meterFill {
+    transition: none;
+  }
+}
+
 .row {
   display: grid;
   grid-template-columns: 14px auto 1fr;
