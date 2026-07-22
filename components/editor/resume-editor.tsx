@@ -13,6 +13,7 @@ import { AppearanceSection } from "./appearance-section";
 import { ClassicOrderSection } from "./classic-order-section";
 import { ContactSection } from "./contact-section";
 import { EditorCompleteness } from "./editor-completeness";
+import { EditorHistory } from "./editor-history";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
 import { InterestsSection } from "./interests-section";
@@ -24,6 +25,7 @@ import { SectionNavProvider } from "./section-nav";
 import { SectionsVisibility } from "./sections-visibility";
 import { SkillsSection } from "./skills-section";
 import { SummarySection } from "./summary-section";
+import { useFormHistory } from "./use-form-history";
 
 const AUTOSAVE_DELAY_MS = 4000;
 const PREVIEW_DELAY_MS = 400;
@@ -119,6 +121,14 @@ export const ResumeEditor = forwardRef<
   const onContentChangeRef = useRef(onContentChange);
   onContentChangeRef.current = onContentChange;
 
+  // Undo/redo over the whole form (UX-3). On restore, refresh the preview
+  // immediately and persist, since a reset()-driven change should behave like
+  // any other edit.
+  const history = useFormHistory(methods, (values) => {
+    onContentChangeRef.current?.(values);
+    void flush();
+  });
+
   // Debounced (3-5s) autosave, plus a much shorter debounce driving the live
   // preview so it feels responsive without re-rendering a PDF per keystroke.
   useEffect(() => {
@@ -168,6 +178,7 @@ export const ResumeEditor = forwardRef<
     <FormProvider {...methods}>
       <SectionNavProvider>
         <div className={styles.stack} onBlurCapture={handleBlurCapture}>
+          <EditorHistory {...history} />
           <EditorCompleteness />
           <ContactSection />
           <AppearanceSection />
