@@ -20,6 +20,7 @@ import { LanguagesSection } from "./languages-section";
 import { LayoutSection } from "./layout-section";
 import { ProjectsSection } from "./projects-section";
 import styles from "./resume-editor.module.css";
+import { SectionNavProvider } from "./section-nav";
 import { SectionsVisibility } from "./sections-visibility";
 import { SkillsSection } from "./skills-section";
 import { SummarySection } from "./summary-section";
@@ -165,22 +166,24 @@ export const ResumeEditor = forwardRef<
 
   return (
     <FormProvider {...methods}>
-      <div className={styles.stack} onBlurCapture={handleBlurCapture}>
-        <EditorCompleteness />
-        <ContactSection />
-        <AppearanceSection />
-        <SectionsVisibility />
-        {template === "sidebar" ? <LayoutSection /> : null}
-        {template === "classic" ? <ClassicOrderSection /> : null}
-        <SummarySection />
-        <ExperienceSection />
-        <EducationSection />
-        <ProjectsSection />
-        <SkillsSection />
-        <LanguagesSection />
-        <CertificationsSection />
-        <InterestsSection />
-      </div>
+      <SectionNavProvider>
+        <div className={styles.stack} onBlurCapture={handleBlurCapture}>
+          <EditorCompleteness />
+          <ContactSection />
+          <AppearanceSection />
+          <SectionsVisibility />
+          {template === "sidebar" ? <LayoutSection /> : null}
+          {template === "classic" ? <ClassicOrderSection /> : null}
+          <SummarySection />
+          <ExperienceSection />
+          <EducationSection />
+          <ProjectsSection />
+          <SkillsSection />
+          <LanguagesSection />
+          <CertificationsSection />
+          <InterestsSection />
+        </div>
+      </SectionNavProvider>
     </FormProvider>
   );
 });

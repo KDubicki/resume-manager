@@ -1,3 +1,9 @@
+.anchor {
+  /* Offset so a jump lands the section below the sticky section nav rather
+     than behind it (nav height + gap). */
+  scroll-margin-top: 64px;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--surface-border);
