@@ -48,6 +48,11 @@
   .previewPane {
     position: sticky;
     top: 0;
+    /* Pin the preview to the viewport while the editor column scrolls, and let
+       it scroll internally if the paper + ATS view are taller than the screen,
+       so the whole preview stays reachable. */
+    max-height: 100dvh;
+    overflow-y: auto;
     padding: 24px;
   }
 }
