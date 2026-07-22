@@ -100,7 +100,7 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
   _Gdzie:_ `resume-editor.tsx`, `section-card.tsx`. _Rozmiar:_ S.
 - [x] **[UX-3] Undo/redo w formularzu** — historia stanu RHF. ✅ zrobione
   _Rozmiar:_ M.
-- [ ] **[UX-4] Walidacja inline z podsumowaniem błędów** — „3 pola wymagają uwagi" + skok do pola.
+- [x] **[UX-4] Walidacja inline z podsumowaniem błędów** — „3 pola wymagają uwagi" + skok do pola. ✅ zrobione
   _Gdzie:_ RHF errors. _Rozmiar:_ S.
 - [ ] **[UX-5] Puste stany z przykładami** — placeholdery/„Add sample" w każdej sekcji.
   _Rozmiar:_ S.

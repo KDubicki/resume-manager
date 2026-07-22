@@ -13,6 +13,7 @@ import { AppearanceSection } from "./appearance-section";
 import { ClassicOrderSection } from "./classic-order-section";
 import { ContactSection } from "./contact-section";
 import { EditorCompleteness } from "./editor-completeness";
+import { EditorErrorSummary } from "./editor-error-summary";
 import { EditorHistory } from "./editor-history";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
@@ -180,6 +181,7 @@ export const ResumeEditor = forwardRef<
         <div className={styles.stack} onBlurCapture={handleBlurCapture}>
           <EditorHistory {...history} />
           <EditorCompleteness />
+          <EditorErrorSummary />
           <ContactSection />
           <AppearanceSection />
           <SectionsVisibility />
