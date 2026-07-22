@@ -102,7 +102,7 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
   _Rozmiar:_ M.
 - [x] **[UX-4] Walidacja inline z podsumowaniem błędów** — „3 pola wymagają uwagi" + skok do pola. ✅ zrobione
   _Gdzie:_ RHF errors. _Rozmiar:_ S.
-- [ ] **[UX-5] Puste stany z przykładami** — placeholdery/„Add sample" w każdej sekcji.
+- [x] **[UX-5] Puste stany z przykładami** — placeholdery/„Add sample" w każdej sekcji. ✅ zrobione
   _Rozmiar:_ S.
 
 ## 8. Import / eksport / udostępnianie

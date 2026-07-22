@@ -8,6 +8,8 @@ import type { ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
+import { SectionEmptyState } from "./section-empty-state";
+import { sampleSkillGroup } from "./section-samples";
 
 export function SkillsSection() {
   const { control } = useFormContext<ResumeContent>();
@@ -19,6 +21,12 @@ export function SkillsSection() {
       meta={`${fields.length} ${fields.length === 1 ? "group" : "groups"}`}
     >
       <div className={styles.list}>
+        {fields.length === 0 && (
+          <SectionEmptyState
+            hint="No skill groups added yet."
+            onAddSample={() => append(sampleSkillGroup())}
+          />
+        )}
         {fields.map((field, index) => (
           <div key={field.id} className={styles.entry}>
             <Controller

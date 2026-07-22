@@ -8,6 +8,8 @@ import type { ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
+import { SectionEmptyState } from "./section-empty-state";
+import { sampleLanguage } from "./section-samples";
 
 export function LanguagesSection() {
   const { control } = useFormContext<ResumeContent>();
@@ -19,6 +21,12 @@ export function LanguagesSection() {
       meta={`${fields.length} ${fields.length === 1 ? "language" : "languages"}`}
     >
       <div className={styles.list}>
+        {fields.length === 0 && (
+          <SectionEmptyState
+            hint="No languages added yet."
+            onAddSample={() => append(sampleLanguage())}
+          />
+        )}
         {fields.map((field, index) => (
           <div key={field.id} className={styles.entry}>
             <div className={styles.row}>

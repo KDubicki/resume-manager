@@ -8,6 +8,8 @@ import type { ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
+import { SectionEmptyState } from "./section-empty-state";
+import { sampleProject } from "./section-samples";
 import { SortableEntry, SortableEntryList } from "./sortable-entry-list";
 
 export function ProjectsSection() {
@@ -20,6 +22,12 @@ export function ProjectsSection() {
       meta={`${fields.length} ${fields.length === 1 ? "project" : "projects"}`}
     >
       <div className={styles.list}>
+        {fields.length === 0 && (
+          <SectionEmptyState
+            hint="No projects added yet."
+            onAddSample={() => append(sampleProject())}
+          />
+        )}
         <SortableEntryList ids={fields.map((field) => field.id)} onReorder={move}>
           {fields.map((field, index) => (
             <SortableEntry key={field.id} id={field.id} label={`project ${index + 1}`}>

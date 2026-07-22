@@ -6,9 +6,11 @@ import { Controller, useFormContext, useWatch } from "react-hook-form";
 import type { ResumeContent } from "@/lib/schemas/resume";
 
 import { SectionCard } from "./section-card";
+import { SectionEmptyState } from "./section-empty-state";
+import { sampleCertifications } from "./section-samples";
 
 export function CertificationsSection() {
-  const { control } = useFormContext<ResumeContent>();
+  const { control, setValue } = useFormContext<ResumeContent>();
   const certifications = useWatch({ control, name: "certifications" });
 
   return (
@@ -32,6 +34,19 @@ export function CertificationsSection() {
           />
         )}
       />
+      {certifications.length === 0 && (
+        <div style={{ marginTop: 12 }}>
+          <SectionEmptyState
+            hint="No certifications or courses added yet."
+            onAddSample={() =>
+              setValue("certifications", sampleCertifications(), {
+                shouldDirty: true,
+                shouldTouch: true,
+              })
+            }
+          />
+        </div>
+      )}
     </SectionCard>
   );
 }
