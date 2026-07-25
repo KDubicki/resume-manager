@@ -32,8 +32,8 @@ export function ClassicOrderSection() {
   return (
     <SectionCard title="Section order">
       <p className={styles.note}>
-        Reorder the Classic template&apos;s sections. Empty or hidden sections keep their place but
-        don&apos;t print.
+        Reorder the sections of the single-column templates (Classic, Modern, Minimal). Empty or
+        hidden sections keep their place but don&apos;t print.
       </p>
       <div className={styles.list}>
         {order.map((key, index) => {

@@ -79,8 +79,40 @@ export const contactSchema = z.object({
 
 // Selects which PDF layout renders — stored inside `content` (not a Prisma
 // column) so the one shared schema still owns the whole payload and no
-// migration is needed to add a template.
-export const templateSchema = z.enum(["classic", "sidebar"]).default("classic");
+// migration is needed to add a template. `classic`, `modern` and `minimal` are
+// single-column (ATS-safe); `sidebar` is the one two-column layout.
+export const templateSchema = z
+  .enum(["classic", "modern", "minimal", "sidebar"])
+  .default("classic");
+
+export type ResumeTemplate = z.infer<typeof templateSchema>;
+
+// Single source of the template display names + picker options, shared by the
+// dashboard badges (app/page.tsx, app/trash/page.tsx) and the two pickers
+// (editor contact-section, new-resume modal) so the labels never drift as
+// templates are added.
+export const TEMPLATE_LABELS: Record<ResumeTemplate, string> = {
+  classic: "Classic",
+  modern: "Modern",
+  minimal: "Minimal",
+  sidebar: "Sidebar",
+};
+
+export const TEMPLATE_OPTIONS: { label: string; value: ResumeTemplate }[] = [
+  { label: "Classic (1-column, ATS-safe)", value: "classic" },
+  { label: "Modern (1-column, ATS-safe)", value: "modern" },
+  { label: "Minimal (1-column, ATS-safe)", value: "minimal" },
+  { label: "Sidebar (2-column)", value: "sidebar" },
+];
+
+// The single-column templates all share the classicOrder section sequence (see
+// CLASSIC_SECTIONS) and single linear reading order; only `sidebar` splits the
+// content into two columns.
+export const SINGLE_COLUMN_TEMPLATES = ["classic", "modern", "minimal"] as const;
+
+export function isSingleColumn(template: ResumeTemplate): boolean {
+  return template !== "sidebar";
+}
 
 // The sections the Sidebar template can place in either column, and their
 // display titles (shared by the PDF template and the layout editor so the two
@@ -258,9 +290,9 @@ export const resumeContentSchema = z.object({
   // only the rendered PDF skips it. `.catch([])` drops the whole array if it's
   // malformed rather than failing the parse, so a bad value never blocks a save.
   hiddenSections: z.array(z.enum(TOGGLEABLE_SECTIONS)).catch([]).default([]),
-  // Classic-only section order; ignored by the Sidebar template. Malformed
-  // values `.catch([])` and are backfilled to the full default order by
-  // normalizeClassicOrder at render time.
+  // Section order for the single-column templates (Classic/Modern/Minimal);
+  // ignored by the Sidebar template. Malformed values `.catch([])` and are
+  // backfilled to the full default order by normalizeClassicOrder at render time.
   classicOrder: z.array(z.enum(CLASSIC_SECTIONS)).catch([]).default(DEFAULT_CLASSIC_ORDER),
   // Sidebar-only: ignored by the Classic (single-column) template.
   sidebarColumns: sidebarColumnsSchema.default(DEFAULT_SIDEBAR_COLUMNS),
@@ -285,7 +317,6 @@ export type LanguageEntry = z.infer<typeof languageEntrySchema>;
 export type CertificationEntry = z.infer<typeof certificationEntrySchema>;
 export type SkillGroup = z.infer<typeof skillGroupSchema>;
 export type Contact = z.infer<typeof contactSchema>;
-export type ResumeTemplate = z.infer<typeof templateSchema>;
 export type ResumeContent = z.infer<typeof resumeContentSchema>;
 
 export const defaultResumeContent: ResumeContent = resumeContentSchema.parse({});
