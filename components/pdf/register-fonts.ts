@@ -31,6 +31,15 @@ async function toSrc(file: string): Promise<string> {
 }
 
 async function doRegister(): Promise<void> {
+  // @react-pdf hyphenates aggressively by default, breaking words mid-syllable
+  // with a trailing hyphen ("Poznan University of Technology-", "Infor-mation",
+  // "Technolo-gy"). That reads badly for a human and can even split a token for
+  // an ATS parser. Returning each word as a single chunk removes the break
+  // opportunities inside words, so lines wrap at spaces and whole words move to
+  // the next line instead. react-pdf still hard-breaks a word that is genuinely
+  // wider than its column, so a long URL/email can't overflow the page.
+  Font.registerHyphenationCallback((word) => [word]);
+
   await Promise.all(
     FONT_FAMILIES.map(async (family) => {
       Font.register({
