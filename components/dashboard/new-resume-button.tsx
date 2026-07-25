@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { createResume } from "@/lib/actions/resume";
-import type { ResumeTemplate } from "@/lib/schemas/resume";
+import { TEMPLATE_OPTIONS, type ResumeTemplate } from "@/lib/schemas/resume";
 
 export function NewResumeButton() {
   const router = useRouter();
@@ -50,10 +50,7 @@ export function NewResumeButton() {
             block
             value={template}
             onChange={(value) => setTemplate(value as ResumeTemplate)}
-            options={[
-              { label: "Classic (1-column, ATS-safe)", value: "classic" },
-              { label: "Sidebar (2-column)", value: "sidebar" },
-            ]}
+            options={TEMPLATE_OPTIONS}
           />
         </div>
       </Modal>

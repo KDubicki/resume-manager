@@ -52,9 +52,11 @@ describe("resumeContentSchema", () => {
     expect(defaultResumeContent).toEqual(result);
   });
 
-  it("defaults the template to classic and accepts sidebar", () => {
+  it("defaults the template to classic and accepts every known template", () => {
     expect(resumeContentSchema.parse({}).template).toBe("classic");
-    expect(resumeContentSchema.parse({ template: "sidebar" }).template).toBe("sidebar");
+    for (const template of ["classic", "modern", "minimal", "sidebar"] as const) {
+      expect(resumeContentSchema.parse({ template }).template).toBe(template);
+    }
     expect(resumeContentSchema.safeParse({ template: "fancy" }).success).toBe(false);
   });
 

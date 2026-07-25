@@ -53,7 +53,8 @@ export const ResumeEditor = forwardRef<
     mode: "onBlur",
   });
   const { watch, getValues } = methods;
-  // The sidebar layout editor only makes sense for the two-column template.
+  // Sidebar gets the two-column layout editor; every other (single-column)
+  // template gets the linear section-order editor.
   const template = useWatch({ control: methods.control, name: "template" });
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
@@ -185,8 +186,7 @@ export const ResumeEditor = forwardRef<
           <ContactSection />
           <AppearanceSection />
           <SectionsVisibility />
-          {template === "sidebar" ? <LayoutSection /> : null}
-          {template === "classic" ? <ClassicOrderSection /> : null}
+          {template === "sidebar" ? <LayoutSection /> : <ClassicOrderSection />}
           <SummarySection />
           <ExperienceSection />
           <EducationSection />

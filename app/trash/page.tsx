@@ -3,18 +3,13 @@ import Link from "next/link";
 import { TrashCard } from "@/components/dashboard/trash-card";
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
-import { resumeContentSchema } from "@/lib/schemas/resume";
+import { resumeContentSchema, TEMPLATE_LABELS, type ResumeTemplate } from "@/lib/schemas/resume";
 
 import styles from "../dashboard.module.css";
 
 export const dynamic = "force-dynamic";
 
-const TEMPLATE_LABEL: Record<string, string> = {
-  classic: "Classic",
-  sidebar: "Sidebar",
-};
-
-function templateOf(content: unknown): string {
+function templateOf(content: unknown): ResumeTemplate {
   const parsed = resumeContentSchema.safeParse(content);
   return parsed.success ? parsed.data.template : "classic";
 }
@@ -56,7 +51,7 @@ export default async function TrashPage() {
               key={resume.id}
               id={resume.id}
               title={resume.title}
-              templateLabel={TEMPLATE_LABEL[templateOf(resume.content)] ?? templateOf(resume.content)}
+              templateLabel={TEMPLATE_LABELS[templateOf(resume.content)] ?? templateOf(resume.content)}
               deletedLabel={resume.deletedAt ? dateFormat.format(resume.deletedAt) : "—"}
             />
           ))}

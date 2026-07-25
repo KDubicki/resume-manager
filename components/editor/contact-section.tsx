@@ -3,7 +3,7 @@
 import { Input, Segmented } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 
-import type { ResumeContent } from "@/lib/schemas/resume";
+import { TEMPLATE_OPTIONS, type ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
@@ -28,14 +28,7 @@ export function ContactSection() {
           name="template"
           control={control}
           render={({ field }) => (
-            <Segmented
-              value={field.value}
-              onChange={field.onChange}
-              options={[
-                { label: "Classic (1-column, ATS-safe)", value: "classic" },
-                { label: "Sidebar (2-column)", value: "sidebar" },
-              ]}
-            />
+            <Segmented value={field.value} onChange={field.onChange} options={TEMPLATE_OPTIONS} />
           )}
         />
         <div className={styles.row}>

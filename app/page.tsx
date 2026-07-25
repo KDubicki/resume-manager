@@ -5,18 +5,13 @@ import { ResumeList } from "@/components/dashboard/resume-list";
 import { computeCompleteness } from "@/lib/ats/completeness";
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
-import { resumeContentSchema } from "@/lib/schemas/resume";
+import { resumeContentSchema, TEMPLATE_LABELS } from "@/lib/schemas/resume";
 
 import styles from "./dashboard.module.css";
 
 // The dashboard must always reflect the newest set of resumes (a just-created
 // or just-seeded one included), so opt out of static caching.
 export const dynamic = "force-dynamic";
-
-const TEMPLATE_LABEL: Record<string, string> = {
-  classic: "Classic",
-  sidebar: "Sidebar",
-};
 
 // Parse once per resume so both the template badge and the completeness meter
 // read from the same validated content (falling back to an empty resume if a
@@ -73,7 +68,7 @@ export default async function DashboardPage() {
             return {
               id: resume.id,
               title: resume.title,
-              templateLabel: TEMPLATE_LABEL[content.template] ?? content.template,
+              templateLabel: TEMPLATE_LABELS[content.template] ?? content.template,
               updatedAt: resume.updatedAt.getTime(),
               updatedLabel: dateFormat.format(resume.updatedAt),
               completeness: computeCompleteness(content).percent,
