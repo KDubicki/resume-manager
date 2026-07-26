@@ -12,12 +12,17 @@ export function SectionCard({
   id,
   title,
   meta,
+  extra,
   children,
   defaultOpen = true,
 }: {
   id?: string;
   title: string;
   meta?: string;
+  // Rendered on the right of the header row (same line as the title), e.g. an
+  // action button. Interactive content should stopPropagation so a click
+  // doesn't also toggle the collapse.
+  extra?: React.ReactNode;
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) {
@@ -60,6 +65,7 @@ export function SectionCard({
                 {meta ? <span className={`font-mono ${styles.meta}`}>{meta}</span> : null}
               </div>
             ),
+            extra,
             children,
           },
         ]}

@@ -36,9 +36,3 @@
   max-width: 340px;
   margin: 0;
 }
-
-.resetRow {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}

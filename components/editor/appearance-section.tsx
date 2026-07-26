@@ -50,13 +50,21 @@ export function AppearanceSection() {
     setValue("theme", defaultTheme, { shouldDirty: true, shouldTouch: true });
 
   return (
-    <SectionCard title="Appearance">
-      <div className={styles.resetRow}>
-        <Button size="small" onClick={resetToRecommended}>
+    <SectionCard
+      title="Appearance"
+      extra={
+        <Button
+          size="small"
+          onClick={(event) => {
+            // Don't let the click bubble to the collapse header and toggle it.
+            event.stopPropagation();
+            resetToRecommended();
+          }}
+        >
           Recommended (reset)
         </Button>
-      </div>
-
+      }
+    >
       <div className={styles.row}>
         <span className={styles.label}>Accent color</span>
         <Controller
