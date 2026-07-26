@@ -20,6 +20,7 @@ describe("resumeContentSchema", () => {
         sectionSpacing: 1,
         pageMargin: 1,
         sidebarColumnWidth: 34,
+        skillsStyle: "chips",
       },
       hiddenSections: [],
       classicOrder: [

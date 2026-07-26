@@ -1,11 +1,15 @@
 import { Text, View } from "@react-pdf/renderer";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
-import type { Contact, Density } from "@/lib/schemas/resume";
+import type { Contact, Density, SkillGroup, SkillsStyle } from "@/lib/schemas/resume";
 
-// The style shape @react-pdf accepts, taken straight from View's own prop type
-// so we don't depend on @react-pdf/types resolving under pnpm's nesting.
-type PdfStyle = ComponentProps<typeof View>["style"];
+// A single @react-pdf style object, derived from View's own `style` prop type so
+// we don't depend on @react-pdf/types resolving under pnpm's nesting. The prop
+// is `Style | Style[] | undefined`; we unwrap it to one `Style` (via a generic
+// so the conditional distributes over the union) so these can be safely composed
+// inside style arrays, e.g. [base, { color: accent }].
+type ArrayElement<T> = T extends ReadonlyArray<infer U> ? U : T;
+type PdfStyle = ArrayElement<NonNullable<ComponentProps<typeof View>["style"]>>;
 
 // How much each density level scales font sizes and spacing. `normal` is the
 // unscaled reference (factor 1); compact tightens, relaxed opens up.
@@ -134,6 +138,63 @@ export function BulletList({
       ))}
     </>
   );
+}
+
+// Style contract every template supplies so the shared skills renderer can lay
+// the section out in any of the three presentations. `chip` is the base box
+// (no border/fill — those are applied per style); `skillInline`/`skillInlineLabel`
+// drive the compact "Category: a, b, c" line.
+export interface SkillStyles {
+  skillGroup: PdfStyle;
+  skillGroupLabel: PdfStyle;
+  skillInline: PdfStyle;
+  skillInlineLabel: PdfStyle;
+  chipRow: PdfStyle;
+  chip: PdfStyle;
+}
+
+// Renders the Skills section in the user-chosen presentation (theme.skillsStyle),
+// identically across every template. Returns an array of per-group nodes (not a
+// fragment) so a caller like Classic's <Section> can still glue the heading to
+// the first group and paginate the rest. `chips` = outlined accent boxes,
+// `inline` = a compact comma-separated line.
+export function skillGroupNodes(
+  groups: SkillGroup[],
+  mode: SkillsStyle,
+  accent: string,
+  styles: SkillStyles,
+): ReactNode[] {
+  return groups.map((group) => {
+    const hasCategory = group.category.trim().length > 0;
+    return (
+      <View key={group.id} style={styles.skillGroup} wrap={false}>
+        {mode === "inline" ? (
+          <Text style={styles.skillInline}>
+            {hasCategory ? (
+              <Text style={[styles.skillInlineLabel, { color: accent }]}>{group.category}: </Text>
+            ) : null}
+            {group.skills.join(", ")}
+          </Text>
+        ) : (
+          <>
+            {hasCategory ? (
+              <Text style={[styles.skillGroupLabel, { color: accent }]}>{group.category}</Text>
+            ) : null}
+            <View style={styles.chipRow}>
+              {group.skills.map((skill, index) => (
+                <Text
+                  key={index}
+                  style={[styles.chip, { borderWidth: 1, borderColor: accent, color: accent }]}
+                >
+                  {skill}
+                </Text>
+              ))}
+            </View>
+          </>
+        )}
+      </View>
+    );
+  });
 }
 
 // Groups consecutive experience entries that share a company so the Classic

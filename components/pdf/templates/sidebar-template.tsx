@@ -8,7 +8,14 @@ import {
   type SidebarSectionKey,
 } from "@/lib/schemas/resume";
 
-import { BulletList, displayName, formatRange, prettyUrl, scaleStyleSheet } from "./shared";
+import {
+  BulletList,
+  displayName,
+  formatRange,
+  prettyUrl,
+  scaleStyleSheet,
+  skillGroupNodes,
+} from "./shared";
 
 const INK = "#333333";
 const MUTED = "#555555";
@@ -108,8 +115,38 @@ const baseStyles = StyleSheet.create({
     flex: 1,
     color: MUTED,
   },
+  // Skills presentation (chips / pills / inline) is chosen by theme.skillsStyle
+  // and rendered by skillGroupNodes; chips are sized down for the narrow rail.
   skillGroup: {
+    marginBottom: 6,
+  },
+  skillGroupLabel: {
+    fontWeight: 700,
+    marginBottom: 3,
+  },
+  skillInline: {
+    color: MUTED,
+    marginBottom: 4,
+  },
+  skillInlineLabel: {
+    fontWeight: 700,
+  },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  chip: {
+    borderRadius: 4,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    marginRight: 5,
     marginBottom: 5,
+    fontSize: 8.5,
+    fontWeight: 600,
+    // Tight lineHeight + centered text so the label sits centered in the chip
+    // rather than riding high (chips otherwise inherit the page's 1.4 leading).
+    lineHeight: 1,
+    textAlign: "center",
   },
   divider: {
     borderBottomWidth: 1,
@@ -205,16 +242,7 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
         : null,
     skills:
       content.skillGroups.length > 0
-        ? content.skillGroups.map((group) => (
-            <View key={group.id} style={styles.skillGroup}>
-              <Text style={styles.paragraph}>
-                {group.category.trim() ? (
-                  <Text style={styles.contactLabel}>{group.category}: </Text>
-                ) : null}
-                {group.skills.join(", ")}
-              </Text>
-            </View>
-          ))
+        ? skillGroupNodes(content.skillGroups, content.theme.skillsStyle, accent, styles)
         : null,
     projects:
       content.projects.length > 0

@@ -281,6 +281,17 @@ export const PAGE_MARGIN_RANGE = { min: 0.6, max: 1.6, step: 0.1 } as const;
 export const DEFAULT_SIDEBAR_COLUMN_WIDTH = 34;
 export const SIDEBAR_COLUMN_WIDTH_RANGE = { min: 20, max: 55, step: 1 } as const;
 
+// How the Skills section is presented, applied by EVERY template (independent of
+// the template choice): outlined chips or a compact inline "Category: a, b, c"
+// line. Rendered by skillGroupNodes in templates/shared.tsx.
+export const SKILLS_STYLES = ["chips", "inline"] as const;
+export type SkillsStyle = (typeof SKILLS_STYLES)[number];
+export const DEFAULT_SKILLS_STYLE: SkillsStyle = "chips";
+export const SKILLS_STYLE_LABELS: Record<SkillsStyle, string> = {
+  chips: "Outlined chips",
+  inline: "Inline text",
+};
+
 export const themeSchema = z.object({
   accent: z
     .string()
@@ -313,6 +324,7 @@ export const themeSchema = z.object({
     .max(SIDEBAR_COLUMN_WIDTH_RANGE.max)
     .catch(DEFAULT_SIDEBAR_COLUMN_WIDTH)
     .default(DEFAULT_SIDEBAR_COLUMN_WIDTH),
+  skillsStyle: z.enum(SKILLS_STYLES).catch(DEFAULT_SKILLS_STYLE).default(DEFAULT_SKILLS_STYLE),
 });
 
 export type ResumeTheme = z.infer<typeof themeSchema>;

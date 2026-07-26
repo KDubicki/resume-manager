@@ -14,6 +14,7 @@ import {
   formatRange,
   groupByCompany,
   scaleStyleSheet,
+  skillGroupNodes,
 } from "./shared";
 
 // Modern: single-column and ATS-safe (real text, one linear top-to-bottom
@@ -118,28 +119,37 @@ const baseStyles = StyleSheet.create({
   bulletText: {
     flex: 1,
   },
+  // Skills presentation (chips / pills / inline) is chosen by theme.skillsStyle
+  // and rendered by skillGroupNodes; these are the base styles it composes with.
   skillGroup: {
     marginBottom: 8,
   },
   skillGroupLabel: {
     fontWeight: 700,
+    marginBottom: 5,
+  },
+  skillInline: {
     marginBottom: 4,
+  },
+  skillInlineLabel: {
+    fontWeight: 700,
   },
   chipRow: {
     flexDirection: "row",
     flexWrap: "wrap",
   },
-  // Solid accent chips (white text) — the filled counterpart to Classic's
-  // outlined chips, matching the bolder Modern header.
   chip: {
-    borderRadius: 2,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
     marginRight: 6,
     marginBottom: 6,
     fontSize: 9.5,
-    fontWeight: 700,
-    color: "#ffffff",
+    fontWeight: 600,
+    // Tight lineHeight + centered text so the label sits centered in the chip
+    // rather than riding high (chips otherwise inherit the page's 1.4 leading).
+    lineHeight: 1,
+    textAlign: "center",
   },
 });
 
@@ -255,20 +265,7 @@ export function ModernTemplate({ title, content }: { title: string; content: Res
     ) : null,
     skills: content.skillGroups.length > 0 ? (
       <Section title="Skills" accent={accent} styles={styles}>
-        {content.skillGroups.map((group) => (
-          <View key={group.id} style={styles.skillGroup} wrap={false}>
-            {group.category.trim() ? (
-              <Text style={[styles.skillGroupLabel, { color: accent }]}>{group.category}</Text>
-            ) : null}
-            <View style={styles.chipRow}>
-              {group.skills.map((skill, index) => (
-                <Text key={index} style={[styles.chip, { backgroundColor: accent }]}>
-                  {skill}
-                </Text>
-              ))}
-            </View>
-          </View>
-        ))}
+        {skillGroupNodes(content.skillGroups, content.theme.skillsStyle, accent, styles)}
       </Section>
     ) : null,
     languages: content.languages.length > 0 ? (

@@ -5,6 +5,18 @@
   width: 100%;
 }
 
+.presentationRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.presentationLabel {
+  font-size: 14px;
+}
+
 .entry {
   display: flex;
   flex-direction: column;

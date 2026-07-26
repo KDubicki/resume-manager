@@ -13,6 +13,7 @@ import {
   displayName,
   formatRange,
   scaleStyleSheet,
+  skillGroupNodes,
 } from "./shared";
 
 // Minimal: single-column and ATS-safe like Classic, but stripped back — no
@@ -96,11 +97,38 @@ const baseStyles = StyleSheet.create({
   bulletText: {
     flex: 1,
   },
+  // Skills presentation (chips / pills / inline) is chosen by theme.skillsStyle
+  // and rendered by skillGroupNodes; these are the base styles it composes with.
   skillGroup: {
-    marginBottom: 5,
+    marginBottom: 8,
   },
-  skillLabel: {
+  skillGroupLabel: {
     fontWeight: 700,
+    marginBottom: 4,
+  },
+  skillInline: {
+    marginBottom: 8,
+    color: "#333333",
+  },
+  skillInlineLabel: {
+    fontWeight: 700,
+  },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  chip: {
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    marginRight: 6,
+    marginBottom: 6,
+    fontSize: 9.5,
+    fontWeight: 600,
+    // Tight lineHeight + centered text so the label sits centered in the chip
+    // rather than riding high (chips otherwise inherit the page's 1.4 leading).
+    lineHeight: 1,
+    textAlign: "center",
   },
 });
 
@@ -202,16 +230,7 @@ export function MinimalTemplate({ title, content }: { title: string; content: Re
     ) : null,
     skills: content.skillGroups.length > 0 ? (
       <Section title="Skills" accent={accent} styles={styles}>
-        {content.skillGroups.map((group) => (
-          <View key={group.id} style={styles.skillGroup}>
-            <Text style={styles.paragraph}>
-              {group.category.trim() ? (
-                <Text style={styles.skillLabel}>{group.category}: </Text>
-              ) : null}
-              {group.skills.join(", ")}
-            </Text>
-          </View>
-        ))}
+        {skillGroupNodes(content.skillGroups, content.theme.skillsStyle, accent, styles)}
       </Section>
     ) : null,
     languages: content.languages.length > 0 ? (

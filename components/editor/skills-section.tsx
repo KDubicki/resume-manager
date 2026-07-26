@@ -1,15 +1,25 @@
 "use client";
 
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Input, Select } from "antd";
+import { Button, Input, Segmented, Select } from "antd";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 
-import type { ResumeContent } from "@/lib/schemas/resume";
+import {
+  DEFAULT_SKILLS_STYLE,
+  SKILLS_STYLES,
+  SKILLS_STYLE_LABELS,
+  type ResumeContent,
+} from "@/lib/schemas/resume";
 
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
 import { SectionEmptyState } from "./section-empty-state";
 import { sampleSkillGroup } from "./section-samples";
+
+const SKILLS_STYLE_OPTIONS = SKILLS_STYLES.map((style) => ({
+  value: style,
+  label: SKILLS_STYLE_LABELS[style],
+}));
 
 export function SkillsSection() {
   const { control } = useFormContext<ResumeContent>();
@@ -20,6 +30,22 @@ export function SkillsSection() {
       title="Skills"
       meta={`${fields.length} ${fields.length === 1 ? "group" : "groups"}`}
     >
+      {/* Presentation applies to the Skills section in every template. */}
+      <div className={styles.presentationRow}>
+        <span className={styles.presentationLabel}>Presentation</span>
+        <Controller
+          name="theme.skillsStyle"
+          control={control}
+          render={({ field }) => (
+            <Segmented
+              value={field.value ?? DEFAULT_SKILLS_STYLE}
+              onChange={field.onChange}
+              options={SKILLS_STYLE_OPTIONS}
+              aria-label="Skills section style"
+            />
+          )}
+        />
+      </div>
       <div className={styles.list}>
         {fields.length === 0 && (
           <SectionEmptyState
