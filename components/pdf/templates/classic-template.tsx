@@ -153,7 +153,10 @@ export function ClassicTemplate({ title, content }: { title: string; content: Re
   const { contact } = content;
   const accent = content.theme.accent;
   const fontFamily = content.theme.fontFamily;
-  const styles = scaleStyleSheet(baseStyles, content.theme.density);
+  const styles = scaleStyleSheet(baseStyles, content.theme.density, {
+    margin: content.theme.sectionSpacing,
+    padding: content.theme.pageMargin,
+  });
   const hidden = new Set(content.hiddenSections);
   const parts = contactParts(contact);
 

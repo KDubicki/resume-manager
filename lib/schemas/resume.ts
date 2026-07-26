@@ -265,6 +265,22 @@ export const DENSITY_LABELS: Record<Density, string> = {
   relaxed: "Relaxed",
 };
 
+// Extra spacing controls layered on top of density (applied in scaleStyleSheet,
+// templates/shared.tsx). Both are multipliers where 1 = the template's baseline:
+// `sectionSpacing` scales the vertical gaps (margins) between sections/entries,
+// `pageMargin` scales the page's outer padding. Ranges are shared with the
+// editor's sliders so the two never drift.
+export const DEFAULT_SECTION_SPACING = 1;
+export const DEFAULT_PAGE_MARGIN = 1;
+export const SECTION_SPACING_RANGE = { min: 0.6, max: 1.8, step: 0.1 } as const;
+export const PAGE_MARGIN_RANGE = { min: 0.6, max: 1.6, step: 0.1 } as const;
+
+// Two-column (Sidebar) template only: width of the LEFT column as a percentage;
+// the right column fills the remainder (100 − this). Single-column templates
+// ignore it.
+export const DEFAULT_SIDEBAR_COLUMN_WIDTH = 34;
+export const SIDEBAR_COLUMN_WIDTH_RANGE = { min: 20, max: 55, step: 1 } as const;
+
 export const themeSchema = z.object({
   accent: z
     .string()
@@ -276,9 +292,34 @@ export const themeSchema = z.object({
   // that isn't registered.
   fontFamily: z.enum(FONT_FAMILIES).catch(DEFAULT_FONT_FAMILY).default(DEFAULT_FONT_FAMILY),
   density: z.enum(DENSITIES).catch(DEFAULT_DENSITY).default(DEFAULT_DENSITY),
+  // Spacing multipliers. `.catch` falls back to the default for an out-of-range
+  // or malformed value (e.g. a mid-edit autosave), so it never blocks a save or
+  // reaches the renderer as NaN.
+  sectionSpacing: z
+    .number()
+    .min(SECTION_SPACING_RANGE.min)
+    .max(SECTION_SPACING_RANGE.max)
+    .catch(DEFAULT_SECTION_SPACING)
+    .default(DEFAULT_SECTION_SPACING),
+  pageMargin: z
+    .number()
+    .min(PAGE_MARGIN_RANGE.min)
+    .max(PAGE_MARGIN_RANGE.max)
+    .catch(DEFAULT_PAGE_MARGIN)
+    .default(DEFAULT_PAGE_MARGIN),
+  sidebarColumnWidth: z
+    .number()
+    .min(SIDEBAR_COLUMN_WIDTH_RANGE.min)
+    .max(SIDEBAR_COLUMN_WIDTH_RANGE.max)
+    .catch(DEFAULT_SIDEBAR_COLUMN_WIDTH)
+    .default(DEFAULT_SIDEBAR_COLUMN_WIDTH),
 });
 
 export type ResumeTheme = z.infer<typeof themeSchema>;
+
+// The recommended defaults for every appearance setting, restored by the
+// editor's "Recommended" reset button.
+export const defaultTheme: ResumeTheme = themeSchema.parse({});
 
 export const resumeContentSchema = z.object({
   template: templateSchema,

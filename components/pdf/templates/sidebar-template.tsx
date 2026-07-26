@@ -8,7 +8,7 @@ import {
   type SidebarSectionKey,
 } from "@/lib/schemas/resume";
 
-import { BulletList, displayName, formatRange, scaleStyleSheet } from "./shared";
+import { BulletList, displayName, formatRange, prettyUrl, scaleStyleSheet } from "./shared";
 
 const INK = "#333333";
 const MUTED = "#555555";
@@ -142,14 +142,17 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
   const { contact } = content;
   const accent = content.theme.accent;
   const fontFamily = content.theme.fontFamily;
-  const styles = scaleStyleSheet(baseStyles, content.theme.density);
+  const styles = scaleStyleSheet(baseStyles, content.theme.density, {
+    margin: content.theme.sectionSpacing,
+    padding: content.theme.pageMargin,
+  });
   // Set<string> (not Set<ToggleableSection>) so `contact` — a Sidebar column
   // key that isn't user-toggleable — can be tested without a type cast.
   const hidden = new Set<string>(content.hiddenSections);
   const contactRows: { label: string; value: string }[] = [
     { label: "Phone: ", value: contact.phone },
     { label: "E-mail: ", value: contact.email },
-    { label: "LinkedIn: ", value: contact.linkedin },
+    { label: "LinkedIn: ", value: prettyUrl(contact.linkedin) },
     { label: "Location: ", value: contact.location },
   ].filter((row) => row.value.trim().length > 0);
 
@@ -269,7 +272,11 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
       <View style={[styles.headerRule, { borderBottomColor: accent }]} />
 
       <View style={styles.columns}>
-        <View style={styles.sidebar}>{renderColumn(columns.left)}</View>
+        {/* Left rail width is user-controlled; the main column flexes to fill
+            the rest (100 − sidebarColumnWidth). */}
+        <View style={[styles.sidebar, { width: `${content.theme.sidebarColumnWidth}%` }]}>
+          {renderColumn(columns.left)}
+        </View>
         <View style={styles.main}>{renderColumn(columns.right)}</View>
       </View>
     </Page>

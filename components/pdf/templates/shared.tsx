@@ -15,43 +15,65 @@ const DENSITY_FACTORS: Record<Density, number> = {
   relaxed: 1.15,
 };
 
-// Only size/spacing props are scaled. Ratios (lineHeight), rules (borderWidth),
-// corner radii, fixed rail widths and letter-spacing are left crisp so density
-// changes overall size + whitespace without distorting proportions.
-const SCALED_PROPS = new Set([
-  "fontSize",
+// Margin/gap props take the section-spacing multiplier; padding props take the
+// page-margin multiplier. fontSize takes neither (only density scales it).
+const MARGIN_PROPS = new Set([
   "marginTop",
   "marginBottom",
   "marginVertical",
   "marginHorizontal",
   "marginLeft",
   "marginRight",
+  "gap",
+]);
+const PADDING_PROPS = new Set([
   "paddingTop",
   "paddingBottom",
   "paddingVertical",
   "paddingHorizontal",
   "paddingLeft",
   "paddingRight",
-  "gap",
 ]);
 
+// Only size/spacing props are scaled. Ratios (lineHeight), rules (borderWidth),
+// corner radii, fixed rail widths and letter-spacing are left crisp so density
+// changes overall size + whitespace without distorting proportions.
+const SCALED_PROPS = new Set<string>(["fontSize", ...MARGIN_PROPS, ...PADDING_PROPS]);
+
+// Optional per-family spacing multipliers layered on top of density: `margin`
+// (the section-spacing control) scales vertical gaps between sections/entries;
+// `padding` (the page-margin control) scales the page's outer padding. Both
+// default to 1 (no extra scaling).
+export interface SpacingFactors {
+  margin?: number;
+  padding?: number;
+}
+
 // Returns a copy of a StyleSheet with size/spacing values multiplied by the
-// density factor. Non-numeric values (e.g. the sidebar's "34%" width) and
-// non-scaled props pass through untouched. Cheap enough to run per render.
+// density factor, and margins/paddings additionally by the spacing factors.
+// Non-numeric values (e.g. the sidebar's "34%" width) and non-scaled props pass
+// through untouched. Cheap enough to run per render.
 export function scaleStyleSheet<T extends Record<string, Record<string, unknown>>>(
   styles: T,
   density: Density,
+  spacing: SpacingFactors = {},
 ): T {
-  const factor = DENSITY_FACTORS[density];
-  if (factor === 1) return styles;
+  const densityFactor = DENSITY_FACTORS[density];
+  const marginFactor = spacing.margin ?? 1;
+  const paddingFactor = spacing.padding ?? 1;
+  if (densityFactor === 1 && marginFactor === 1 && paddingFactor === 1) return styles;
   const out: Record<string, Record<string, unknown>> = {};
   for (const [name, style] of Object.entries(styles)) {
     const next: Record<string, unknown> = {};
     for (const [prop, value] of Object.entries(style)) {
-      next[prop] =
-        typeof value === "number" && SCALED_PROPS.has(prop)
-          ? Math.round(value * factor * 100) / 100
-          : value;
+      if (typeof value === "number" && SCALED_PROPS.has(prop)) {
+        let scaled = value * densityFactor;
+        if (MARGIN_PROPS.has(prop)) scaled *= marginFactor;
+        else if (PADDING_PROPS.has(prop)) scaled *= paddingFactor;
+        next[prop] = Math.round(scaled * 100) / 100;
+      } else {
+        next[prop] = value;
+      }
     }
     out[name] = next;
   }
@@ -73,10 +95,22 @@ export function displayName(contact: Contact, title: string): string {
   return contact.fullName.trim() || title;
 }
 
+// Strips the protocol, a leading "www.", and any trailing slash from a URL so a
+// long link like "https://www.linkedin.com/in/foo/" reads as
+// "linkedin.com/in/foo". Plain (non-URL) text passes through unchanged.
+export function prettyUrl(value: string): string {
+  return value
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/\/+$/, "");
+}
+
 // The contact line (phone · email · linkedin · location), skipping blanks so
-// there are never orphaned separators.
+// there are never orphaned separators. The LinkedIn URL is prettified so a full
+// "https://www.…" link doesn't dominate the line.
 export function contactParts(contact: Contact): string[] {
-  return [contact.phone, contact.email, contact.linkedin, contact.location]
+  return [contact.phone, contact.email, prettyUrl(contact.linkedin), contact.location]
     .map((part) => part.trim())
     .filter((part) => part.length > 0);
 }

@@ -21,3 +21,24 @@
 .fontSelect {
   min-width: 200px;
 }
+
+/* Slider controls stack their label above the track so the marks have room. */
+.field {
+  margin-top: 16px;
+}
+
+.field .label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.slider {
+  max-width: 340px;
+  margin: 0;
+}
+
+.resetRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}

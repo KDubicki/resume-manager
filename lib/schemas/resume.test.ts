@@ -17,6 +17,9 @@ describe("resumeContentSchema", () => {
         accent: "#2a6cf0",
         fontFamily: "Roboto",
         density: "normal",
+        sectionSpacing: 1,
+        pageMargin: 1,
+        sidebarColumnWidth: 34,
       },
       hiddenSections: [],
       classicOrder: [
