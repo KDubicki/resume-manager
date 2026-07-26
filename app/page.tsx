@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ImportResumeButton } from "@/components/dashboard/import-resume-button";
 import { NewResumeButton } from "@/components/dashboard/new-resume-button";
 import { ResumeList } from "@/components/dashboard/resume-list";
 import { computeCompleteness } from "@/lib/ats/completeness";
@@ -49,6 +50,7 @@ export default async function DashboardPage() {
               Trash ({trashedCount})
             </Link>
           ) : null}
+          <ImportResumeButton />
           <NewResumeButton />
         </div>
       </div>
@@ -58,8 +60,11 @@ export default async function DashboardPage() {
           <h2 className="font-display" style={{ margin: 0 }}>
             No resumes yet
           </h2>
-          <p className={styles.subtitle}>Create your first one to get started.</p>
-          <NewResumeButton />
+          <p className={styles.subtitle}>Create your first one — or import a JSON Resume file.</p>
+          <div className={styles.headerActions}>
+            <ImportResumeButton />
+            <NewResumeButton />
+          </div>
         </div>
       ) : (
         <ResumeList

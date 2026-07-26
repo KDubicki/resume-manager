@@ -17,6 +17,7 @@ import { EditorErrorSummary } from "./editor-error-summary";
 import { EditorHistory } from "./editor-history";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
+import { ImportSection } from "./import-section";
 import { InterestsSection } from "./interests-section";
 import { LanguagesSection } from "./languages-section";
 import { LayoutSection } from "./layout-section";
@@ -131,6 +132,28 @@ export const ResumeEditor = forwardRef<
     void flush();
   });
 
+  // JSON import (editor flow): replace the resume DATA but keep the user's
+  // presentation choices (template, theme, hidden sections, and both order
+  // maps). reset() swaps the whole form; we then refresh the preview and
+  // persist immediately, the same way a history restore does.
+  const handleImport = useCallback(
+    (imported: ResumeContent) => {
+      const current = getValues();
+      const merged: ResumeContent = {
+        ...imported,
+        template: current.template,
+        theme: current.theme,
+        hiddenSections: current.hiddenSections,
+        classicOrder: current.classicOrder,
+        sidebarColumns: current.sidebarColumns,
+      };
+      methods.reset(merged);
+      onContentChangeRef.current?.(merged);
+      void flush();
+    },
+    [getValues, methods, flush],
+  );
+
   // Debounced (3-5s) autosave, plus a much shorter debounce driving the live
   // preview so it feels responsive without re-rendering a PDF per keystroke.
   useEffect(() => {
@@ -183,6 +206,7 @@ export const ResumeEditor = forwardRef<
           <EditorHistory {...history} />
           <EditorCompleteness />
           <EditorErrorSummary />
+          <ImportSection onImport={handleImport} />
           <ContactSection />
           <AppearanceSection />
           <SectionsVisibility />

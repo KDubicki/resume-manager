@@ -2,6 +2,7 @@
 
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
+import { mapJsonResume } from "@/lib/import/json-resume";
 import {
   resumeContentSchema,
   type ResumeTemplate,
@@ -23,6 +24,36 @@ export async function createResume(
     },
   });
   return { id: resume.id };
+}
+
+export type ImportResult = { ok: true; id: string } | { ok: false; error: string };
+
+// Creates a brand-new resume from an uploaded JSON Resume (jsonresume.org)
+// document. The raw payload is mapped and then re-validated through the shared
+// schema here on the server — the client's mapping is only for preview, this is
+// the gate that decides what actually reaches the JSONB column.
+export async function importResumeFromJson(
+  title: string,
+  raw: unknown,
+  template: ResumeTemplate = "classic",
+): Promise<ImportResult> {
+  const parsed = resumeContentSchema.safeParse({ ...mapJsonResume(raw), template });
+  if (!parsed.success) {
+    return { ok: false, error: "The file didn't map to a valid resume." };
+  }
+
+  try {
+    const resume = await prisma.resume.create({
+      data: {
+        userId: DEMO_USER_ID,
+        title: title.trim() || parsed.data.contact.fullName.trim() || "Imported resume",
+        content: parsed.data,
+      },
+    });
+    return { ok: true, id: resume.id };
+  } catch {
+    return { ok: false, error: "A database error occurred while importing." };
+  }
 }
 
 export async function duplicateResume(

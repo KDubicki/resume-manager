@@ -1,0 +1,32 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file {
+  font-size: 12px;
+  color: var(--muted-ink, #666);
+}
+
+.identity {
+  margin: 0;
+  font-size: 15px;
+}
+
+.counts {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted-ink, #666);
+  font-size: 13px;
+}
+
+.counts li {
+  margin: 2px 0;
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted-ink, #666);
+  font-size: 13px;
+}
