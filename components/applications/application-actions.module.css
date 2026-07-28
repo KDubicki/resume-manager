@@ -1,0 +1,11 @@
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.deleteButton,
+.deleteButton:hover,
+.deleteButton:focus {
+  color: var(--error-ink, #c1440e);
+}

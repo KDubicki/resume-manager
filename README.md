@@ -231,6 +231,8 @@ It is validated by `applicationInputSchema` (`lib/schemas/application.ts`) on bo
 - The **job description lives here, not in the resume** — a posting is a property of the application, not of the CV. Opening a resume linked to an application seeds the ATS Lens with that posting and writes edits back on a debounce; an unlinked resume keeps the browser-only scratchpad behavior.
 - `resumeId` is nullable and `SetNull` on delete: an application outlives the resume it was sent with, so permanently deleting a CV doesn't erase the fact that you applied.
 
+`/applications` renders the same data two ways — a searchable list and a kanban board with one column per stage, dragged with dnd-kit. There is no persisted per-column position: order inside a column is the active sort, so a drag only ever writes `status`.
+
 ### Templates
 
 One `ResumeDocument` (`components/pdf/resume-document.tsx`) dispatches on

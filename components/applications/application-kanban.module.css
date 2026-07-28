@@ -1,0 +1,189 @@
+.board {
+  display: grid;
+  /* All five stages on screen at once — no horizontal scrolling to discover
+     that "Rejected" exists. `minmax(0, 1fr)` lets the columns shrink evenly
+     instead of being pushed wide by long company names. */
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  /* Five readable columns don't fit a phone; there the board scrolls. */
+  .board {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(200px, 1fr);
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 10px;
+}
+
+/* A rule between stages, so the eye separates the columns even when a
+   neighbouring one is empty. */
+.column + .column {
+  border-left: 1px solid var(--surface-border, #e0e0e0);
+}
+
+.columnHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 24px;
+}
+
+.columnTag {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count {
+  font-size: 12px;
+  color: var(--muted-ink, #666);
+}
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 140px;
+  padding: 8px 4px;
+  border: 1px dashed transparent;
+  border-radius: 10px;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.dropZone[data-over] {
+  border-color: var(--focus-ring, #0f5c57);
+  background: color-mix(in srgb, var(--focus-ring, #0f5c57) 8%, transparent);
+}
+
+.card {
+  position: relative; /* anchors the visually-hidden drag handle */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--surface-border, #e0e0e0);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  cursor: grab;
+  /* Let a touch swipe scroll the board; the touch sensor's press delay is what
+     starts a drag instead. */
+  touch-action: manipulation;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card[data-dragging] {
+  opacity: 0.4;
+}
+
+.overlayCard {
+  /* The floating copy under the cursor: lifted, no interactive parts. */
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+  cursor: grabbing;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+  /* Pull the icon row tight against the meta line above it. */
+  margin: -2px -4px -4px 0;
+}
+
+/* The keyboard-only drag activator: out of the layout until it's focused. */
+.handle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: none;
+  background: none;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.handle:focus-visible {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  padding: 2px;
+  border-radius: 4px;
+  clip-path: none;
+  color: var(--muted-ink, #666);
+  outline: 2px solid var(--focus-ring, #0f5c57);
+}
+
+.cardTitle {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+
+.company {
+  font-size: 13.5px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.role {
+  font-size: 12px;
+  color: var(--muted-ink, #666);
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--muted-ink, #666);
+}
+
+.meta > * + *::before {
+  content: "·";
+  margin-right: 6px;
+}
+
+.resumeLink {
+  color: var(--accent, #2a6cf0);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.resumeLink:hover {
+  text-decoration: underline;
+}
+
+.noResume {
+  font-style: italic;
+}
+
+.emptyColumn {
+  margin: auto 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--muted-ink, #666);
+}

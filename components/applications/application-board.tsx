@@ -1,7 +1,7 @@
 "use client";
 
-import { SearchOutlined } from "@ant-design/icons";
-import { Button, Empty, Input, Segmented, Select } from "antd";
+import { AppstoreOutlined, SearchOutlined, UnorderedListOutlined } from "@ant-design/icons";
+import { Button, Empty, Input, Segmented, Select, Tooltip } from "antd";
 import { useMemo, useState } from "react";
 
 import { APPLICATION_STATUS_LABELS, APPLICATION_STATUSES } from "@/lib/schemas/application";
@@ -17,6 +17,8 @@ import {
   type StatusFilter,
 } from "./application-filters";
 import { ApplicationFormModal, type ResumeOption } from "./application-form-modal";
+import { ApplicationKanban } from "./application-kanban";
+import { useStoredView, type ApplicationView } from "./use-stored-view";
 
 export function ApplicationBoard({
   applications,
@@ -28,6 +30,8 @@ export function ApplicationBoard({
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("ALL");
   const [sort, setSort] = useState<ApplicationSortKey>("updated-desc");
+  // Remembered between visits; "list" on the server and until storage is read.
+  const [view, setView] = useStoredView();
   // `null` while open means "create"; the modal is shared by both paths so the
   // validation and field set can't drift between adding and editing.
   const [editing, setEditing] = useState<ApplicationItem | null>(null);
@@ -35,8 +39,15 @@ export function ApplicationBoard({
 
   const counts = useMemo(() => countByStatus(applications), [applications]);
   const visible = useMemo(
-    () => filterAndSortApplications(applications, { query, status, sort }),
-    [applications, query, status, sort],
+    // The kanban's columns *are* the stage filter, so it only applies the
+    // search and the sort (which orders cards inside each column).
+    () =>
+      filterAndSortApplications(applications, {
+        query,
+        status: view === "board" ? "ALL" : status,
+        sort,
+      }),
+    [applications, query, status, sort, view],
   );
 
   const openCreate = () => {
@@ -76,18 +87,43 @@ export function ApplicationBoard({
           aria-label="Sort applications"
           className={styles.sort}
         />
+        <Segmented<ApplicationView>
+          value={view}
+          onChange={setView}
+          aria-label="View"
+          options={[
+            {
+              value: "list",
+              label: (
+                <Tooltip title="List">
+                  <UnorderedListOutlined aria-label="List view" />
+                </Tooltip>
+              ),
+            },
+            {
+              value: "board",
+              label: (
+                <Tooltip title="Board">
+                  <AppstoreOutlined aria-label="Board view" />
+                </Tooltip>
+              ),
+            },
+          ]}
+        />
         <Button type="primary" onClick={openCreate}>
           Track application
         </Button>
       </div>
 
-      <Segmented<StatusFilter>
-        value={status}
-        onChange={setStatus}
-        options={filterOptions}
-        className={styles.stages}
-        aria-label="Filter by stage"
-      />
+      {view === "list" ? (
+        <Segmented<StatusFilter>
+          value={status}
+          onChange={setStatus}
+          options={filterOptions}
+          className={styles.stages}
+          aria-label="Filter by stage"
+        />
+      ) : null}
 
       {visible.length === 0 ? (
         <Empty
@@ -104,6 +140,8 @@ export function ApplicationBoard({
             </Button>
           ) : null}
         </Empty>
+      ) : view === "board" ? (
+        <ApplicationKanban applications={visible} onEdit={openEdit} />
       ) : (
         <div className={styles.grid}>
           {visible.map((application) => (
