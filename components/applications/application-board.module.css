@@ -1,0 +1,34 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search {
+  flex: 1 1 240px;
+  max-width: 360px;
+}
+
+.sort {
+  min-width: 200px;
+}
+
+.stages {
+  margin-bottom: 24px;
+  max-width: 100%;
+  /* The stage counts make this wider than the page on narrow screens; let it
+     scroll rather than squeeze the grid below it. */
+  overflow-x: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.emptyResult {
+  margin: 48px 0;
+}

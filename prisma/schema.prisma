@@ -18,6 +18,8 @@ model Resume {
   // filters `deletedAt: null`; the trash view filters `deletedAt: not null`.
   deletedAt DateTime?
 
+  applications Application[]
+
   @@index([userId, status])
   @@index([userId, deletedAt])
 }
@@ -25,4 +27,42 @@ model Resume {
 enum Status {
   DRAFT
   PUBLISHED
+}
+
+// One row per role the user is chasing. Unlike Resume, this is normalized:
+// the fields are small, queried and filtered on (status, company), so there's
+// no reason to hide them in a JSONB blob.
+model Application {
+  id      String            @id @default(cuid())
+  userId  String
+  company String
+  role    String
+  jobUrl  String            @default("")
+  // The pasted posting. Previously this lived only in editor state and was
+  // lost on refresh; storing it here is what lets the ATS lens re-run keyword
+  // matching against the same posting on the next visit.
+  jobDescription String     @default("")
+  notes          String     @default("")
+  status         ApplicationStatus @default(SAVED)
+  // Set when the application first reaches APPLIED, so the list can show "how
+  // long ago" independently of later edits.
+  appliedAt DateTime?
+  // Optional and SetNull on delete: an application outlives the resume it was
+  // sent with (permanently deleting a resume must not erase the fact that you
+  // applied).
+  resumeId  String?
+  resume    Resume?  @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([resumeId])
+}
+
+enum ApplicationStatus {
+  SAVED
+  APPLIED
+  INTERVIEW
+  OFFER
+  REJECTED
 }

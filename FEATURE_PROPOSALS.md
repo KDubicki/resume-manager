@@ -145,6 +145,16 @@ Legenda priorytetów: **P0** = szybkie, duża wartość, brak blokerów ·
 - [ ] **[QoL-4] Tryb podglądu pełnoekranowego PDF**. _Rozmiar:_ S.
 - [ ] **[QoL-5] Data „ostatni eksport" na karcie**. _Rozmiar:_ S.
 
+## 12. Śledzenie aplikacji (tracker)
+
+- [x] **[AP-1] Model `Application` + widok `/applications`** — firma, stanowisko, link do oferty, notatki, etap (`SAVED → APPLIED → INTERVIEW → OFFER / REJECTED`), opcjonalne powiązanie z CV. Lista z wyszukiwarką, filtrem etapów i sortowaniem; zmiana etapu wprost z karty. ✅ zrobione
+  _Dlaczego:_ appka nazywa się „manager", a zarządzała plikami, nie procesem. _Gdzie:_ `prisma/schema.prisma`, `lib/schemas/application.ts`, `lib/actions/application.ts`, `app/applications/`, `components/applications/`. _Rozmiar:_ M.
+- [x] **[AP-2] Trwały job description** — JD przeniesiony z lokalnego stanu edytora do `Application.jobDescription`; CV powiązane z aplikacją zasiewa ATS Lens tą ofertą i zapisuje zmiany na debounce (CV bez powiązania działa jak dotąd — lokalnie). ✅ zrobione — **unieważnia** notatkę „stan lokalny" przy **ATS-1**.
+  _Gdzie:_ `app/resume/[id]/page.tsx`, `components/editor/editor-client.tsx`, `components/pdf/job-description-panel.tsx`. _Rozmiar:_ S.
+- [ ] **[AP-3] Widok kanban** — świadomie pominięty przy AP-1; kolumny per etap z drag & drop (dnd-kit jest już w projekcie). _Rozmiar:_ M. _Zależy:_ AP-1.
+- [ ] **[AP-4] Follow-upy** — sygnał „X dni bez odpowiedzi" liczony z `appliedAt`. _Rozmiar:_ S. _Zależy:_ AP-1.
+- [ ] **[AP-5] „Aplikuj tym CV"** — akcja z karty na dashboardzie: tworzy aplikację od razu powiązaną z tym dokumentem (dziś powiązanie ustawia się w modalu aplikacji). _Rozmiar:_ S. _Zależy:_ AP-1.
+
 ---
 
 ## Sugerowana kolejność (pierwsze 2–3 iteracje)

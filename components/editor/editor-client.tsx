@@ -14,6 +14,7 @@ import {
 import { AtsLens } from "@/components/pdf/ats-lens";
 import { JobDescriptionPanel } from "@/components/pdf/job-description-panel";
 import { LivePreview } from "@/components/pdf/live-preview";
+import { saveApplicationJobDescription } from "@/lib/actions/application";
 import { saveTitle } from "@/lib/actions/resume";
 import type { ResumeContent } from "@/lib/schemas/resume";
 import { slugify } from "@/lib/slugify";
@@ -21,15 +22,28 @@ import { slugify } from "@/lib/slugify";
 import styles from "./editor-client.module.css";
 
 const TITLE_SAVE_DELAY_MS = 1500;
+// The posting is pasted in one go far more often than it's typed, so it can
+// settle a little longer than the title before hitting the DB.
+const JD_SAVE_DELAY_MS = 2000;
+
+export type LinkedApplication = {
+  id: string;
+  company: string;
+  role: string;
+  jobDescription: string;
+};
 
 export function EditorClient({
   resumeId,
   initialTitle,
   initialValues,
+  application = null,
 }: {
   resumeId: string;
   initialTitle: string;
   initialValues: ResumeContent;
+  /** The tracked application this resume was written for, if there is one. */
+  application?: LinkedApplication | null;
 }) {
   const { message } = App.useApp();
   const [title, setTitle] = useState(initialTitle);
@@ -41,9 +55,11 @@ export function EditorClient({
   // Seeded with the persisted content (not defaults) so the preview is correct
   // on first paint, before the user touches anything.
   const [previewContent, setPreviewContent] = useState<ResumeContent>(initialValues);
-  // Job description to target the resume against. Deliberately local-only: it
-  // never enters `content` (or the DB), and later drives ATS keyword matching.
-  const [jobDescription, setJobDescription] = useState("");
+  // Job description to target the resume against. It never enters `content` —
+  // it belongs to the application, not the resume. Linked to one, it's seeded
+  // from that row and written back on a debounce; unlinked, it stays a local
+  // scratchpad exactly as before.
+  const [jobDescription, setJobDescription] = useState(application?.jobDescription ?? "");
   const [exporting, setExporting] = useState(false);
   const editorRef = useRef<ResumeEditorHandle>(null);
 
@@ -79,6 +95,39 @@ export function EditorClient({
       if (titleSaveTimeoutRef.current) clearTimeout(titleSaveTimeoutRef.current);
     };
   }, []);
+
+  // Same debounce shape as the title, against the application row rather than
+  // the resume. The ref holds the newest text so the unmount flush (leaving the
+  // editor within the debounce window) sends what the user actually typed.
+  const applicationId = application?.id ?? null;
+  const jobDescriptionRef = useRef(jobDescription);
+  const jdSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleJobDescriptionChange = useCallback(
+    (value: string) => {
+      setJobDescription(value);
+      jobDescriptionRef.current = value;
+      // No application linked: nothing to persist it to, so it stays local.
+      if (!applicationId) return;
+      if (jdSaveTimeoutRef.current) clearTimeout(jdSaveTimeoutRef.current);
+      jdSaveTimeoutRef.current = setTimeout(() => {
+        jdSaveTimeoutRef.current = null;
+        void saveApplicationJobDescription(applicationId, jobDescriptionRef.current);
+      }, JD_SAVE_DELAY_MS);
+    },
+    [applicationId],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (!jdSaveTimeoutRef.current) return;
+      clearTimeout(jdSaveTimeoutRef.current);
+      jdSaveTimeoutRef.current = null;
+      if (applicationId) {
+        void saveApplicationJobDescription(applicationId, jobDescriptionRef.current);
+      }
+    };
+  }, [applicationId]);
 
   const handleExport = useCallback(async () => {
     setExporting(true);
@@ -147,7 +196,11 @@ export function EditorClient({
           <div className={styles.previewStack}>
             <LivePreview title={title} content={previewContent} />
             <AtsLens content={previewContent} jobDescription={jobDescription} />
-            <JobDescriptionPanel value={jobDescription} onChange={setJobDescription} />
+            <JobDescriptionPanel
+              value={jobDescription}
+              onChange={handleJobDescriptionChange}
+              linkedTo={application ? `${application.role} · ${application.company}` : null}
+            />
           </div>
         }
         onExport={() => void handleExport()}
