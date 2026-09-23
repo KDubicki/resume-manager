@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { ApplicationBoard } from "@/components/applications/application-board";
 import type { ApplicationItem } from "@/components/applications/application-filters";
 import { DEMO_USER_ID } from "@/lib/constants";
@@ -56,9 +54,6 @@ export default async function ApplicationsPage() {
             against.
           </p>
         </div>
-        <Link href="/" className={styles.trashLink}>
-          ← Back to resumes
-        </Link>
       </div>
 
       <ApplicationBoard

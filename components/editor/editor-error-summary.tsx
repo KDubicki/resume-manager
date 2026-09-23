@@ -16,7 +16,7 @@ function prefersReducedMotion() {
 
 // Inline validation summary (UX-4): a running count of fields needing attention,
 // each a button that expands its section and focuses the field.
-export function EditorErrorSummary() {
+export function EditorErrorSummary({ onBeforeJump }: { onBeforeJump?: () => void }) {
   const { control, setFocus } = useFormContext<ResumeContent>();
   const { errors } = useFormState({ control });
   const nav = useSectionNav();
@@ -25,6 +25,7 @@ export function EditorErrorSummary() {
   if (flat.length === 0) return null;
 
   const jump = (name: string) => {
+    onBeforeJump?.();
     const anchor = anchorFor(name);
     if (anchor) nav?.setOpen(anchor, true);
     // Wait a frame so a just-expanded section is in the DOM before focusing.

@@ -1,9 +1,9 @@
 "use client";
 
-import { Input, Segmented } from "antd";
+import { Input } from "antd";
 import { Controller, useFormContext } from "react-hook-form";
 
-import { TEMPLATE_OPTIONS, type ResumeContent } from "@/lib/schemas/resume";
+import type { ResumeContent } from "@/lib/schemas/resume";
 
 import styles from "./list-section.module.css";
 import { SectionCard } from "./section-card";
@@ -21,16 +21,6 @@ export function ContactSection() {
   return (
     <SectionCard title="Header & Contact">
       <div className={styles.list}>
-        {/* Template switch lives here so it's the first thing in the editor;
-            it's a form field, so autosave persists it and the live preview
-            re-renders in the chosen layout immediately. */}
-        <Controller
-          name="template"
-          control={control}
-          render={({ field }) => (
-            <Segmented value={field.value} onChange={field.onChange} options={TEMPLATE_OPTIONS} />
-          )}
-        />
         <div className={styles.row}>
           <Controller
             name="contact.fullName"
@@ -40,7 +30,9 @@ export function ContactSection() {
           <Controller
             name="contact.headline"
             control={control}
-            render={({ field }) => <Input {...field} placeholder="Headline (e.g. Security Engineer)" />}
+            render={({ field }) => (
+              <Input {...field} placeholder="Headline (e.g. Security Engineer)" />
+            )}
           />
         </div>
         <div className={styles.row}>

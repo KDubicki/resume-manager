@@ -2,8 +2,11 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Inter } from "next/font/google";
 
+import { AppNav } from "@/components/app-shell/app-nav";
 import { FoucGate } from "@/components/app-shell/fouc-gate";
 import { ThemeProvider, THEME_NO_FLASH_SCRIPT } from "@/components/theme/theme-provider";
+import { DEMO_USER_ID } from "@/lib/constants";
+import { prisma } from "@/lib/db";
 
 import "./globals.css";
 
@@ -33,7 +36,19 @@ export const metadata: Metadata = {
   description: "Write for a person. Export for a parser.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// The nav's counts are read from the DB on every request. Without this the
+// build would try to prerender (e.g. /_not-found) and hit the database.
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [openApplications, trashedCount] = await Promise.all([
+    // Only the live pipeline is worth a badge — a rejection doesn't need chasing.
+    prisma.application.count({
+      where: { userId: DEMO_USER_ID, status: { in: ["SAVED", "APPLIED", "INTERVIEW", "OFFER"] } },
+    }),
+    prisma.resume.count({ where: { userId: DEMO_USER_ID, deletedAt: { not: null } } }),
+  ]);
+
   return (
     <html
       lang="en"
@@ -49,7 +64,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             so it never depends on antd styles itself. */}
         <FoucGate />
         <AntdRegistry>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <AppNav openApplications={openApplications} trashedCount={trashedCount} />
+            {children}
+          </ThemeProvider>
         </AntdRegistry>
       </body>
     </html>

@@ -13,7 +13,7 @@ export interface LoadedJsonResume {
 }
 
 // Reads a user-selected .json file, parses it, and builds a mapped preview.
-// Shared by the dashboard import modal and the editor import card so both read
+// Shared by the dashboard import modal and the editor import modal so both read
 // files and surface errors identically.
 export function useJsonResumeFile() {
   const [loaded, setLoaded] = useState<LoadedJsonResume | null>(null);

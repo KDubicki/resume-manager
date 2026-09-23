@@ -8,12 +8,6 @@
   flex-wrap: wrap;
 }
 
-.brand {
-  font-size: 22px;
-  line-height: 1;
-  color: var(--brass);
-}
-
 .title {
   flex: 1 1 auto;
   min-width: 0;

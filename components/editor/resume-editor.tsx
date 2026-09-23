@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { FormProvider, useForm, useWatch, type Resolver } from "react-hook-form";
 
 import type { SaveStatus } from "@/components/app-shell/save-indicator";
@@ -14,10 +15,10 @@ import { ClassicOrderSection } from "./classic-order-section";
 import { ContactSection } from "./contact-section";
 import { EditorCompleteness } from "./editor-completeness";
 import { EditorErrorSummary } from "./editor-error-summary";
-import { EditorHistory } from "./editor-history";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
-import { ImportSection } from "./import-section";
+import { EditorToolbar, type EditorMode } from "./editor-toolbar";
+import { ImportJsonModal } from "./import-json-modal";
 import { InterestsSection } from "./interests-section";
 import { LanguagesSection } from "./languages-section";
 import { LayoutSection } from "./layout-section";
@@ -27,6 +28,7 @@ import { SectionNavProvider } from "./section-nav";
 import { SectionsVisibility } from "./sections-visibility";
 import { SkillsSection } from "./skills-section";
 import { SummarySection } from "./summary-section";
+import { TemplatePicker } from "./template-picker";
 import { useFormHistory } from "./use-form-history";
 
 const AUTOSAVE_DELAY_MS = 4000;
@@ -64,6 +66,12 @@ export const ResumeEditor = forwardRef<
 
   // Seeded from the row's updatedAt: this state is reported up on mount, so
   // starting at "idle" would show "Not saved yet" for a persisted resume.
+  // Content = what the resume says; Design = how it looks (DS-5). Only the
+  // active mode's cards mount; RHF keeps unmounted fields' values, so autosave,
+  // validation and the preview still see the whole resume.
+  const [mode, setMode] = useState<EditorMode>("content");
+  const [importOpen, setImportOpen] = useState(false);
+
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(initialSavedAt ? "saved" : "idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(initialSavedAt);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -207,25 +215,48 @@ export const ResumeEditor = forwardRef<
 
   return (
     <FormProvider {...methods}>
+      {/* Above the provider, whose sticky jump-nav renders first: the mode
+          switch decides which sections that nav lists, so it leads. */}
+      <div className={styles.toolbar}>
+        <EditorToolbar
+          mode={mode}
+          onModeChange={setMode}
+          history={history}
+          onImportClick={() => setImportOpen(true)}
+        />
+      </div>
       <SectionNavProvider>
         <div className={styles.stack} onBlurCapture={handleBlurCapture}>
-          <EditorHistory {...history} />
-          <EditorCompleteness />
-          <EditorErrorSummary />
-          <ImportSection onImport={handleImport} />
-          <ContactSection />
-          <AppearanceSection />
-          <SectionsVisibility />
-          {template === "sidebar" ? <LayoutSection /> : <ClassicOrderSection />}
-          <SummarySection />
-          <ExperienceSection />
-          <EducationSection />
-          <ProjectsSection />
-          <SkillsSection />
-          <LanguagesSection />
-          <CertificationsSection />
-          <InterestsSection />
+          {/* Every validated field is a Content field, so a jump from Design
+              switches back first (synchronously, so the field exists to focus). */}
+          <EditorErrorSummary onBeforeJump={() => flushSync(() => setMode("content"))} />
+          {mode === "content" ? (
+            <>
+              <EditorCompleteness />
+              <ContactSection />
+              <SummarySection />
+              <ExperienceSection />
+              <EducationSection />
+              <ProjectsSection />
+              <SkillsSection />
+              <LanguagesSection />
+              <CertificationsSection />
+              <InterestsSection />
+            </>
+          ) : (
+            <>
+              <TemplatePicker />
+              <AppearanceSection />
+              <SectionsVisibility />
+              {template === "sidebar" ? <LayoutSection /> : <ClassicOrderSection />}
+            </>
+          )}
         </div>
+        <ImportJsonModal
+          open={importOpen}
+          onClose={() => setImportOpen(false)}
+          onImport={handleImport}
+        />
       </SectionNavProvider>
     </FormProvider>
   );

@@ -53,6 +53,27 @@
   background: var(--surface);
 }
 
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 52px;
+  padding: 0 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.navBrand {
+  width: 150px;
+  height: 20px;
+  margin-right: 12px;
+}
+
+.navLink {
+  width: 72px;
+  height: 14px;
+}
+
 /* Placeholder blocks: a base fill with a sweeping shimmer. */
 .block {
   position: relative;

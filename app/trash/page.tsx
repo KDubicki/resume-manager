@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { TrashCard } from "@/components/dashboard/trash-card";
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
@@ -32,9 +30,6 @@ export default async function TrashPage() {
             Deleted resumes stay here until you restore or permanently delete them.
           </p>
         </div>
-        <Link href="/" className={styles.trashLink}>
-          ← Back to resumes
-        </Link>
       </div>
 
       {resumes.length === 0 ? (
@@ -51,7 +46,9 @@ export default async function TrashPage() {
               key={resume.id}
               id={resume.id}
               title={resume.title}
-              templateLabel={TEMPLATE_LABELS[templateOf(resume.content)] ?? templateOf(resume.content)}
+              templateLabel={
+                TEMPLATE_LABELS[templateOf(resume.content)] ?? templateOf(resume.content)
+              }
               deletedLabel={resume.deletedAt ? dateFormat.format(resume.deletedAt) : "—"}
             />
           ))}

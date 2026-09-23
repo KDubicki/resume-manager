@@ -1,7 +1,6 @@
 "use client";
 
 import { App } from "antd";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { TopBar } from "@/components/app-shell/top-bar";
@@ -174,9 +173,6 @@ export function EditorClient({
 
   return (
     <div className={styles.page}>
-      <Link href="/" className={styles.backLink}>
-        ← All resumes
-      </Link>
       <TopBar
         title={title}
         onTitleChange={handleTitleChange}

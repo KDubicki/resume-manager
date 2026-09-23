@@ -1,21 +1,8 @@
 .page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-}
-
-.backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 24px 0;
-  font-size: 13px;
-  color: var(--muted-ink);
-  text-decoration: none;
-}
-
-.backLink:hover {
-  text-decoration: underline;
+  /* body is a flex column; take the height left under the global nav. */
+  flex: 1 0 auto;
 }
 
 .previewStack {

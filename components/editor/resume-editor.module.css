@@ -3,3 +3,7 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.toolbar {
+  margin-bottom: 16px;
+}

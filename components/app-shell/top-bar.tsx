@@ -2,8 +2,6 @@
 
 import { Button, Space, Typography } from "antd";
 
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-
 import { SaveIndicator, type SaveStatus } from "./save-indicator";
 import styles from "./top-bar.module.css";
 
@@ -28,9 +26,6 @@ export function TopBar({
 }) {
   return (
     <header className={styles.bar}>
-      <div className={styles.brand} aria-hidden="true">
-        ◱
-      </div>
       <Typography.Title
         level={4}
         className={`font-display ${styles.title}`}
@@ -46,7 +41,6 @@ export function TopBar({
           error={saveError}
           onRetry={onRetrySave}
         />
-        <ThemeToggle />
         <Button type="primary" loading={exporting} onClick={onExport}>
           Export PDF
         </Button>

@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { ImportResumeButton } from "@/components/dashboard/import-resume-button";
 import { NewResumeButton } from "@/components/dashboard/new-resume-button";
 import { ResumeList } from "@/components/dashboard/resume-list";
@@ -31,15 +29,6 @@ export default async function DashboardPage() {
     select: { id: true, title: true, content: true, updatedAt: true },
   });
 
-  const trashedCount = await prisma.resume.count({
-    where: { userId: DEMO_USER_ID, deletedAt: { not: null } },
-  });
-
-  // Only the live pipeline is worth a badge — a rejection doesn't need chasing.
-  const openApplications = await prisma.application.count({
-    where: { userId: DEMO_USER_ID, status: { in: ["SAVED", "APPLIED", "INTERVIEW", "OFFER"] } },
-  });
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -50,14 +39,6 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className={styles.headerActions}>
-          <Link href="/applications" className={styles.trashLink}>
-            Applications{openApplications > 0 ? ` (${openApplications})` : ""}
-          </Link>
-          {trashedCount > 0 ? (
-            <Link href="/trash" className={styles.trashLink}>
-              Trash ({trashedCount})
-            </Link>
-          ) : null}
           <ImportResumeButton />
           <NewResumeButton />
         </div>

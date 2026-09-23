@@ -89,7 +89,7 @@ export type ResumeTemplate = z.infer<typeof templateSchema>;
 
 // Single source of the template display names + picker options, shared by the
 // dashboard badges (app/page.tsx, app/trash/page.tsx) and the two pickers
-// (editor contact-section, new-resume modal) so the labels never drift as
+// (editor template-picker, new-resume modal) so the labels never drift as
 // templates are added.
 export const TEMPLATE_LABELS: Record<ResumeTemplate, string> = {
   classic: "Classic",

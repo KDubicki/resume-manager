@@ -6,13 +6,26 @@ import { describe, expect, it } from "vitest";
 const ROOT = join(__dirname, "..", "..");
 const GLOBALS = readFileSync(join(ROOT, "app", "globals.css"), "utf8");
 
-function moduleCssFiles(dir: string): string[] {
+function filesEndingWith(dir: string, suffix: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
-    if (entry.isDirectory()) return moduleCssFiles(path);
-    return entry.name.endsWith(".module.css") ? [path] : [];
+    if (entry.isDirectory()) return filesEndingWith(path, suffix);
+    return entry.name.endsWith(suffix) ? [path] : [];
   });
 }
+
+const inSourceDirs = (suffix: string) =>
+  filesEndingWith(join(ROOT, "app"), suffix).concat(
+    filesEndingWith(join(ROOT, "components"), suffix),
+  );
+
+// Component-scoped properties set from TSX via the style prop, e.g.
+// style={{ "--tpl-accent": accent }}; these are defined where they're used.
+const inlineProps = new Set(
+  inSourceDirs(".tsx").flatMap((file) =>
+    [...readFileSync(file, "utf8").matchAll(/["'](--[a-z0-9-]+)["']\s*:/g)].map((m) => m[1]!),
+  ),
+);
 
 // Custom properties declared inside the first `{ ... }` block that follows
 // `selector` (theme blocks contain no nested braces).
@@ -33,13 +46,12 @@ const systemDark = definedIn(':root:not([data-theme="light"])');
 describe("design tokens", () => {
   it("defines every custom property a CSS module uses", () => {
     const used = new Set(
-      moduleCssFiles(join(ROOT, "app"))
-        .concat(moduleCssFiles(join(ROOT, "components")))
+      inSourceDirs(".module.css")
         .flatMap((file) =>
           [...readFileSync(file, "utf8").matchAll(/var\((--[a-z0-9-]+)/g)].map((m) => m[1]!),
         )
         // --font-* come from next/font on <html>, not from globals.css.
-        .filter((name) => !name.startsWith("--font-")),
+        .filter((name) => !name.startsWith("--font-") && !inlineProps.has(name)),
     );
     expect([...used].filter((name) => !light.has(name))).toEqual([]);
   });

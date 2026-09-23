@@ -15,6 +15,18 @@ import styles from "./fouc-gate.module.css";
 // CSS, so it's correct on the very first paint — covers the page until React
 // has hydrated (exactly when antd's styles have been injected), then fades out.
 // It only appears on a full load/refresh, not on client navigation.
+// Mirrors the global AppNav (same height and border) above every skeleton.
+function NavSkeleton() {
+  return (
+    <div className={styles.navbar} aria-hidden="true">
+      <span className={`${styles.block} ${styles.navBrand}`} />
+      <span className={`${styles.block} ${styles.navLink}`} />
+      <span className={`${styles.block} ${styles.navLink}`} />
+      <span className={`${styles.block} ${styles.navLink}`} />
+    </div>
+  );
+}
+
 function GridSkeleton() {
   return (
     <div className={styles.shell} aria-hidden="true">
@@ -87,6 +99,7 @@ export function FoucGate() {
       role="status"
       aria-live="polite"
     >
+      <NavSkeleton />
       {isEditor ? <EditorSkeleton /> : <GridSkeleton />}
       <span className={styles.srOnly}>Loading…</span>
     </div>

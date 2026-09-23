@@ -8,6 +8,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 32px;
 }
@@ -27,18 +28,6 @@
   display: flex;
   align-items: center;
   gap: 16px;
-}
-
-.trashLink {
-  font-size: 14px;
-  color: var(--muted-ink);
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.trashLink:hover {
-  color: var(--accent);
-  text-decoration: underline;
 }
 
 .empty {

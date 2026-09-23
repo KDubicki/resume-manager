@@ -1,0 +1,183 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 12px;
+}
+
+.option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px 10px;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.option:hover {
+  border-color: var(--accent);
+}
+
+.option:has(.input:checked) {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.option:has(.input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Visually hidden, still a real radio for keyboard + screen readers. */
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.verdict {
+  display: flex;
+  flex-direction: column;
+  font-size: 10.5px;
+  line-height: 1.3;
+  color: var(--muted-ink);
+}
+
+.verdict[data-warn] {
+  color: var(--warn-ink);
+}
+
+/* ---- the miniature page (paper ignores the theme, like the preview) ---- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 72px;
+  height: 100px;
+  padding: 7px;
+  background: var(--paper);
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 3px 10px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.head {
+  flex: none;
+  height: 7px;
+  width: 60%;
+  border-radius: 1px;
+  background: #16211f;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  gap: 5px;
+  min-height: 0;
+}
+
+.rail {
+  display: none;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5px;
+}
+
+.heading {
+  height: 3px;
+  width: 45%;
+  background: var(--tpl-accent);
+  border-radius: 1px;
+}
+
+.line {
+  height: 2px;
+  width: 100%;
+  background: #d8ddda;
+  border-radius: 1px;
+}
+
+.short {
+  width: 65%;
+}
+
+/* Classic: plain name, headings underlined by a full-width rule. */
+.page[data-template="classic"] .heading {
+  width: 100%;
+  height: 1px;
+  box-shadow: 0 -2px 0 0 var(--tpl-accent);
+  margin-top: 2px;
+}
+
+/* Modern: a filled accent header band, accent-bar section titles. */
+.page[data-template="modern"] {
+  padding-top: 0;
+}
+
+.page[data-template="modern"] .head {
+  width: calc(100% + 14px);
+  height: 18px;
+  margin: 0 -7px;
+  border-radius: 0;
+  background: var(--tpl-accent);
+}
+
+.page[data-template="modern"] .heading {
+  border-left: 3px solid var(--tpl-accent);
+  background: #16211f;
+  width: 50%;
+}
+
+/* Minimal: restraint and whitespace; small name, tiny accent labels. */
+.page[data-template="minimal"] {
+  gap: 10px;
+}
+
+.page[data-template="minimal"] .head {
+  width: 40%;
+  height: 4px;
+}
+
+.page[data-template="minimal"] .main {
+  gap: 10px;
+}
+
+.page[data-template="minimal"] .heading {
+  width: 25%;
+  height: 2px;
+}
+
+/* Sidebar: a tinted left rail next to the main column. */
+.page[data-template="sidebar"] .rail {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 34%;
+  padding: 4px 3px;
+  background: color-mix(in srgb, var(--tpl-accent) 16%, transparent);
+  border-radius: 1px;
+}
