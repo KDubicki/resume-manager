@@ -7,5 +7,5 @@
 .deleteButton,
 .deleteButton:hover,
 .deleteButton:focus {
-  color: var(--error-ink, #c1440e);
+  color: var(--error-ink);
 }

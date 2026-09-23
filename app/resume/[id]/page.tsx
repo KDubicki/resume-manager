@@ -14,7 +14,7 @@ export default async function ResumePage({ params }: { params: Promise<{ id: str
   // resume that belongs to someone else must 404 exactly like a missing one.
   const resume = await prisma.resume.findFirst({
     where: { id, userId: DEMO_USER_ID, deletedAt: null },
-    select: { id: true, title: true, content: true },
+    select: { id: true, title: true, content: true, updatedAt: true },
   });
 
   if (!resume) {
@@ -41,6 +41,7 @@ export default async function ResumePage({ params }: { params: Promise<{ id: str
       resumeId={resume.id}
       initialTitle={resume.title}
       initialValues={content}
+      lastSavedAt={resume.updatedAt}
       application={application}
     />
   );

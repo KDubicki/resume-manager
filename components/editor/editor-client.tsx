@@ -37,19 +37,24 @@ export function EditorClient({
   resumeId,
   initialTitle,
   initialValues,
+  lastSavedAt,
   application = null,
 }: {
   resumeId: string;
   initialTitle: string;
   initialValues: ResumeContent;
+  /** When the row was last persisted — the editor opens already "Saved". */
+  lastSavedAt: Date;
   /** The tracked application this resume was written for, if there is one. */
   application?: LinkedApplication | null;
 }) {
   const { message } = App.useApp();
   const [title, setTitle] = useState(initialTitle);
+  // An existing resume is already persisted, so it opens as "Saved · hh:mm"
+  // rather than "Not saved yet".
   const [saveState, setSaveState] = useState<SaveState>({
-    status: "idle",
-    lastSavedAt: null,
+    status: "saved",
+    lastSavedAt,
     error: null,
   });
   // Seeded with the persisted content (not defaults) so the preview is correct
@@ -188,6 +193,7 @@ export function EditorClient({
             ref={editorRef}
             resumeId={resumeId}
             initialValues={initialValues}
+            initialSavedAt={lastSavedAt}
             onSaveStateChange={handleSaveStateChange}
             onContentChange={setPreviewContent}
           />

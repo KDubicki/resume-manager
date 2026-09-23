@@ -1,7 +1,7 @@
 .note {
   margin: 0 0 16px;
   font-size: 13px;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
 }
 
 .columns {
@@ -20,7 +20,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border: 1px solid var(--surface-border, #e0e0e0);
+  border: 1px solid var(--surface-border);
   border-radius: 8px;
   padding: 12px;
 }
@@ -30,7 +30,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
   margin-bottom: 4px;
 }
 
@@ -39,10 +39,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  border: 1px solid var(--surface-border, #e0e0e0);
+  border: 1px solid var(--surface-border);
   border-radius: 6px;
   padding: 6px 6px 6px 12px;
-  background: var(--surface, #fff);
+  background: var(--surface);
 }
 
 .itemLabel {
@@ -57,7 +57,7 @@
 
 .emptyHint {
   font-size: 13px;
-  color: var(--muted-ink, #888);
+  color: var(--muted-ink);
   padding: 8px 4px;
   font-style: italic;
 }

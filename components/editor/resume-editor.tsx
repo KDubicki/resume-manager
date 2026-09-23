@@ -40,10 +40,14 @@ export const ResumeEditor = forwardRef<
   {
     resumeId: string;
     initialValues: ResumeContent;
+    initialSavedAt?: Date | null;
     onSaveStateChange?: (state: SaveState) => void;
     onContentChange?: (content: ResumeContent) => void;
   }
->(function ResumeEditor({ resumeId, initialValues, onSaveStateChange, onContentChange }, ref) {
+>(function ResumeEditor(
+  { resumeId, initialValues, initialSavedAt = null, onSaveStateChange, onContentChange },
+  ref,
+) {
   const methods = useForm<ResumeContent>({
     // zodResolver infers the schema's *input* type (fields with .default()
     // are optional there), but every value that ever flows through this
@@ -58,8 +62,10 @@ export const ResumeEditor = forwardRef<
   // template gets the linear section-order editor.
   const template = useWatch({ control: methods.control, name: "template" });
 
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
-  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  // Seeded from the row's updatedAt: this state is reported up on mount, so
+  // starting at "idle" would show "Not saved yet" for a persisted resume.
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>(initialSavedAt ? "saved" : "idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(initialSavedAt);
   const [saveError, setSaveError] = useState<string | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

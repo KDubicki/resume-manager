@@ -10,7 +10,7 @@
   gap: 6px;
   padding: 10px 24px 0;
   font-size: 13px;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
   text-decoration: none;
 }
 

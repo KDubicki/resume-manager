@@ -27,7 +27,7 @@
 .label {
   font-size: 11px;
   letter-spacing: 0.6px;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
 }
 
 .hint,
@@ -37,11 +37,11 @@
 }
 
 .hint {
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
 }
 
 .error {
-  color: var(--error-ink, #b23a48);
+  color: var(--error-ink);
 }
 
 .fullWidth {

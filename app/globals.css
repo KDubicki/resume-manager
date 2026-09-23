@@ -9,6 +9,14 @@
   --surface-border: #d8ddda;
   --error-ink: #b23a48;
   --focus-ring: #0f5c57;
+  /* Secondary text (mirrors colorTextSecondary), the UI's interactive accent
+     (petrol — NOT the resume's own theme.accent), a quiet fill for badges,
+     and the brass-family warning ink. Every var(--x) used by a CSS module
+     must be defined here; lib/theme/css-tokens.test.ts enforces it. */
+  --muted-ink: #586662;
+  --accent: #0f5c57;
+  --surface-subtle: #f1f3f2;
+  --warn-ink: #b8862a;
 }
 
 :root[data-theme="dark"] {
@@ -19,6 +27,10 @@
   --surface-border: #2a3532;
   --error-ink: #d3707a;
   --focus-ring: #39a99e;
+  --muted-ink: #9daba6;
+  --accent: #39a99e;
+  --surface-subtle: #1e2826;
+  --warn-ink: #d6a24c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,6 +42,10 @@
     --surface-border: #2a3532;
     --error-ink: #d3707a;
     --focus-ring: #39a99e;
+    --muted-ink: #9daba6;
+    --accent: #39a99e;
+    --surface-subtle: #1e2826;
+    --warn-ink: #d6a24c;
   }
 }
 

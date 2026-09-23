@@ -29,7 +29,7 @@
   background: none;
   border: none;
   border-radius: 6px;
-  color: var(--muted-ink, #888);
+  color: var(--muted-ink);
   cursor: grab;
   touch-action: none;
 }

@@ -41,11 +41,11 @@
 }
 
 .fill[data-band="fair"] {
-  background: var(--warn-ink, #c8860a);
+  background: var(--warn-ink);
 }
 
 .fill[data-band="weak"] {
-  background: var(--error-ink, #b23a48);
+  background: var(--error-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

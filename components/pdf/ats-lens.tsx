@@ -150,7 +150,8 @@ export function AtsLens({
           value={sections.length > 0 ? sections.join(", ") : "None yet"}
           status={sections.length > 0 ? "pass" : "pending"}
         />
-        <Row label="Fonts" value="Roboto (embed)" status="info" />
+        {/* The family the PDF actually embeds (TP-2), not a fixed default. */}
+        <Row label="Fonts" value={`${content.theme.fontFamily} (embed)`} status="info" />
         {keywords && keywords.total > 0 && (
           <>
             <Row

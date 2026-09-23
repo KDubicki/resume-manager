@@ -19,7 +19,7 @@
 
 .subtitle {
   margin: 0;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
   max-width: 460px;
 }
 
@@ -31,13 +31,13 @@
 
 .trashLink {
   font-size: 14px;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
   text-decoration: none;
   white-space: nowrap;
 }
 
 .trashLink:hover {
-  color: var(--accent, #2a6cf0);
+  color: var(--accent);
   text-decoration: underline;
 }
 

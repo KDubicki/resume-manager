@@ -1,7 +1,7 @@
 .note {
   margin: 0 0 16px;
   font-size: 13px;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
 }
 
 .list {

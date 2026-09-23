@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 8px;
   padding: 18px 20px 20px;
-  border: 1px solid var(--surface-border, #e0e0e0);
+  border: 1px solid var(--surface-border);
   border-radius: 10px;
   transition:
     border-color 0.15s ease,
@@ -11,7 +11,7 @@
 }
 
 .card:hover {
-  border-color: var(--accent, #2a6cf0);
+  border-color: var(--accent);
   transform: translateY(-2px);
 }
 
@@ -35,7 +35,7 @@
 .deleteButton,
 .deleteButton:hover,
 .deleteButton:focus {
-  color: var(--error-ink, #c1440e);
+  color: var(--error-ink);
 }
 
 .company {
@@ -46,7 +46,7 @@
 
 .role {
   font-size: 14px;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
 }
 
 .meta {
@@ -55,7 +55,7 @@
   align-items: center;
   gap: 8px;
   font-size: 12.5px;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
 }
 
 .meta > * + *::before {
@@ -64,7 +64,7 @@
 }
 
 .resumeLink {
-  color: var(--accent, #2a6cf0);
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -80,7 +80,7 @@
   margin: 0;
   font-size: 13px;
   line-height: 1.45;
-  color: var(--muted-ink, #666);
+  color: var(--muted-ink);
   /* Notes are a reminder, not a document — keep cards the same height. */
   display: -webkit-box;
   -webkit-line-clamp: 2;
