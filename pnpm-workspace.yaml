@@ -4,3 +4,5 @@ allowBuilds:
   prisma: true
   sharp: true
   unrs-resolver: true
+patchedDependencies:
+  '@react-pdf/textkit@6.3.0': patches/@react-pdf__textkit@6.3.0.patch

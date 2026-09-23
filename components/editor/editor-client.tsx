@@ -15,8 +15,8 @@ import { JobDescriptionPanel } from "@/components/pdf/job-description-panel";
 import { LivePreview } from "@/components/pdf/live-preview";
 import { saveApplicationJobDescription } from "@/lib/actions/application";
 import { saveTitle } from "@/lib/actions/resume";
+import { pdfFileName } from "@/lib/export-name";
 import type { ResumeContent } from "@/lib/schemas/resume";
-import { slugify } from "@/lib/slugify";
 
 import styles from "./editor-client.module.css";
 
@@ -151,7 +151,11 @@ export function EditorClient({
       if (!response.ok) throw new Error(`export failed with ${response.status}`);
 
       const blob = await response.blob();
-      const filename = `${slugify(title)}.pdf`;
+      // The server names the file from the row it just rendered (flushed
+      // above); previewContent can trail the form by the preview debounce.
+      const filename =
+        /filename="([^"]+)"/.exec(response.headers.get("Content-Disposition") ?? "")?.[1] ??
+        pdfFileName(title, previewContent);
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -169,7 +173,7 @@ export function EditorClient({
     } finally {
       setExporting(false);
     }
-  }, [resumeId, title, message, flushTitle]);
+  }, [resumeId, title, previewContent, message, flushTitle]);
 
   return (
     <div className={styles.page}>

@@ -75,7 +75,9 @@ const baseStyles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 700,
     textTransform: "uppercase",
-    letterSpacing: 2,
+    // No letterSpacing: tracking on a heading makes gap-based PDF text
+    // extractors (i.e. most ATS parsers) read it as separate letters
+    // ("E D U C A T I O N"), so the section can't be recognised.
     marginTop: 14,
     marginBottom: 6,
   },

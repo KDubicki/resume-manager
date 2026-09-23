@@ -1,5 +1,6 @@
 import { Document } from "@react-pdf/renderer";
 
+import { pdfTitle } from "@/lib/export-name";
 import type { ResumeContent } from "@/lib/schemas/resume";
 
 import { ClassicTemplate } from "./templates/classic-template";
@@ -15,7 +16,14 @@ import { SidebarTemplate } from "./templates/sidebar-template";
 // second render path.
 export function ResumeDocument({ title, content }: { title: string; content: ResumeContent }) {
   return (
-    <Document title={title}>
+    // Metadata a recruiter's viewer and an ATS read: the candidate, not the
+    // user's internal resume label.
+    <Document
+      title={pdfTitle(title, content)}
+      author={content.contact.fullName.trim() || undefined}
+      subject={content.contact.headline.trim() || undefined}
+      creator="Resume Manager"
+    >
       {content.template === "sidebar" ? (
         <SidebarTemplate title={title} content={content} />
       ) : content.template === "modern" ? (

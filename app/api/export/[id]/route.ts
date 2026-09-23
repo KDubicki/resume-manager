@@ -5,8 +5,8 @@ import { registerPdfFonts } from "@/components/pdf/register-fonts";
 import { ResumeDocument } from "@/components/pdf/resume-document";
 import { DEMO_USER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/db";
+import { pdfFileName } from "@/lib/export-name";
 import { resumeContentSchema } from "@/lib/schemas/resume";
-import { slugify } from "@/lib/slugify";
 
 // PDF rendering is CPU/memory-bound (see architecture.md); this must stay off
 // the edge runtime.
@@ -41,7 +41,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${slugify(resume.title)}.pdf"`,
+      "Content-Disposition": `attachment; filename="${pdfFileName(resume.title, parsed.data)}"`,
     },
   });
 }

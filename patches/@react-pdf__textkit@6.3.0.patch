@@ -1,0 +1,19 @@
+diff --git a/lib/textkit.js b/lib/textkit.js
+index 0b8b6fa636c48ef0ac9cecb27040d2bac9303ce8..aa92f61dcf072047fe1d07b2914bdd2496171d34 100644
+--- a/lib/textkit.js
++++ b/lib/textkit.js
+@@ -2629,7 +2629,13 @@ const getNodes = (attributedString, { align }, options) => {
+         const width = advanceWidthBetween(start, start + s.length, attributedString);
+         if (s.trim() === '') {
+             const stretch = (width * opts.width) / opts.stretch;
+-            const shrink = (width * opts.width) / opts.shrink;
++            // resume-manager patch: never let a space shrink. A shrunk glue
++            // lets the breaker accept a line wider than its box, which
++            // justifyLine then squeezes by tracking EVERY glyph; gap-based
++            // PDF text extractors (ATS parsers) then drop that line's word
++            // spaces ("Eagertoleverageadeep..."). With zero shrink the
++            // breaker only accepts lines that fit, so none are squeezed.
++            const shrink = 0;
+             const end = start + s.length;
+             // Add glue node. Glue nodes are used to fill the space between words.
+             acc.push(linebreak.glue(width, start, end, stretch, shrink));

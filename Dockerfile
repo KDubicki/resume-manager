@@ -8,6 +8,8 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts ./
 COPY prisma ./prisma
+# pnpm applies these during install (patchedDependencies in pnpm-workspace.yaml).
+COPY patches ./patches
 # Only needed so `prisma generate` (run via postinstall) can resolve a value;
 # the real DATABASE_URL is supplied at runtime by docker-compose.yml.
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
