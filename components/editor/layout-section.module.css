@@ -23,6 +23,16 @@
   border: 1px solid var(--surface-border);
   border-radius: 8px;
   padding: 12px;
+  /* Room to drop even when the column is short or empty. */
+  min-height: 120px;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.column[data-over] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 
 .columnHead {
@@ -32,27 +42,6 @@
   letter-spacing: 0.5px;
   color: var(--muted-ink);
   margin-bottom: 4px;
-}
-
-.item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border: 1px solid var(--surface-border);
-  border-radius: 6px;
-  padding: 6px 6px 6px 12px;
-  background: var(--surface);
-}
-
-.itemLabel {
-  font-size: 14px;
-}
-
-.itemActions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
 }
 
 .emptyHint {
