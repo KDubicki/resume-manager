@@ -1,5 +1,5 @@
 import { Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import type { ReactNode } from "react";
+import { Children, type ReactNode } from "react";
 
 import {
   normalizeSidebarColumns,
@@ -285,14 +285,23 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
     // Drop empty and hidden sections first so the "first" (no top margin)
     // styling lands on whichever section actually renders at the top.
     const present = keys.filter((key) => bodies[key] != null && !hidden.has(key));
-    return present.map((key, index) => (
-      <View key={key}>
-        <SidebarSectionTitle accent={accent} styles={styles} first={index === 0}>
-          {SIDEBAR_SECTION_LABELS[key]}
-        </SidebarSectionTitle>
-        {bodies[key]}
-      </View>
-    ));
+    return present.map((key, index) => {
+      // Heading glued to its first block (shared wrap={false} view) so it can
+      // never strand alone at the bottom of a page; the rest flows normally.
+      // Mirrors the Section helper in the single-column templates.
+      const [first, ...rest] = Children.toArray(bodies[key]);
+      return (
+        <View key={key}>
+          <View wrap={false}>
+            <SidebarSectionTitle accent={accent} styles={styles} first={index === 0}>
+              {SIDEBAR_SECTION_LABELS[key]}
+            </SidebarSectionTitle>
+            {first}
+          </View>
+          {rest}
+        </View>
+      );
+    });
   }
 
   return (
