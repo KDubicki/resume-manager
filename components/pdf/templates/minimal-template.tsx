@@ -261,7 +261,7 @@ export function MinimalTemplate({ title, content }: { title: string; content: Re
   return (
     // Single column: layout reads top-to-bottom in one linear pass, so an ATS
     // parser never has to guess reading order.
-    <Page size="A4" style={[styles.page, { fontFamily }]}>
+    <Page size={content.theme.pageSize} style={[styles.page, { fontFamily }]}>
       <Text style={styles.name}>{displayName(contact, title)}</Text>
       {contact.headline.trim() ? <Text style={styles.headline}>{contact.headline}</Text> : null}
       {parts.length > 0 ? <Text style={styles.contactLine}>{parts.join("   ·   ")}</Text> : null}

@@ -21,6 +21,7 @@ describe("resumeContentSchema", () => {
         pageMargin: 1,
         sidebarColumnWidth: 34,
         skillsStyle: "chips",
+        pageSize: "A4",
       },
       hiddenSections: [],
       classicOrder: [
@@ -86,6 +87,14 @@ describe("resumeContentSchema", () => {
     expect(resumeContentSchema.parse({ theme: { fontFamily: "Comic Sans" } }).theme.fontFamily).toBe(
       "Roboto",
     );
+  });
+
+  it("defaults the page size to A4, keeps Letter, and falls back on bad values", () => {
+    expect(resumeContentSchema.parse({}).theme.pageSize).toBe("A4");
+    expect(resumeContentSchema.parse({ theme: { pageSize: "LETTER" } }).theme.pageSize).toBe(
+      "LETTER",
+    );
+    expect(resumeContentSchema.parse({ theme: { pageSize: "A3" } }).theme.pageSize).toBe("A4");
   });
 
   it("defaults the density, accepts a known level, and falls back on an unknown one", () => {

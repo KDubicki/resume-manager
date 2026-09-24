@@ -305,7 +305,7 @@ export function SidebarTemplate({ title, content }: { title: string; content: Re
   }
 
   return (
-    <Page size="A4" style={[styles.page, { fontFamily }]}>
+    <Page size={content.theme.pageSize} style={[styles.page, { fontFamily }]}>
       <Text style={styles.name}>{displayName(contact, title)}</Text>
       {contact.headline.trim() ? <Text style={styles.headline}>{contact.headline}</Text> : null}
       <View style={[styles.headerRule, { borderBottomColor: accent }]} />

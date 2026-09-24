@@ -296,7 +296,7 @@ export function ModernTemplate({ title, content }: { title: string; content: Res
   return (
     // Single column: layout reads top-to-bottom in one linear pass, so an ATS
     // parser never has to guess reading order.
-    <Page size="A4" style={[styles.page, { fontFamily }]}>
+    <Page size={content.theme.pageSize} style={[styles.page, { fontFamily }]}>
       <View style={[styles.header, { backgroundColor: accent }]}>
         <Text style={styles.name}>{displayName(contact, title)}</Text>
         {contact.headline.trim() ? <Text style={styles.headline}>{contact.headline}</Text> : null}

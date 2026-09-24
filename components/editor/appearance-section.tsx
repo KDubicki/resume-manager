@@ -8,6 +8,7 @@ import {
   DEFAULT_DENSITY,
   DEFAULT_FONT_FAMILY,
   DEFAULT_PAGE_MARGIN,
+  DEFAULT_PAGE_SIZE,
   DEFAULT_SECTION_SPACING,
   DEFAULT_SIDEBAR_COLUMN_WIDTH,
   DENSITIES,
@@ -15,6 +16,8 @@ import {
   FONT_FAMILIES,
   FONT_FAMILY_LABELS,
   PAGE_MARGIN_RANGE,
+  PAGE_SIZE_LABELS,
+  PAGE_SIZES,
   SECTION_SPACING_RANGE,
   SIDEBAR_COLUMN_WIDTH_RANGE,
   defaultTheme,
@@ -38,16 +41,26 @@ const DENSITY_OPTIONS = DENSITIES.map((density) => ({
   label: DENSITY_LABELS[density],
 }));
 
+const PAGE_SIZE_OPTIONS = PAGE_SIZES.map((size) => ({
+  value: size,
+  label: PAGE_SIZE_LABELS[size],
+}));
+
 const factorTip = (value?: number) => `${(value ?? 1).toFixed(1)}×`;
 
 export function AppearanceSection() {
-  const { control, setValue } = useFormContext<ResumeContent>();
+  const { control, getValues, setValue } = useFormContext<ResumeContent>();
   const template = useWatch({ control, name: "template" });
   const sidebarWidth = useWatch({ control, name: "theme.sidebarColumnWidth" });
 
-  // Restore every appearance setting to its recommended default in one shot.
+  // Restore every appearance setting to its recommended default in one shot —
+  // except the page size, which follows where the resume is sent, not taste.
   const resetToRecommended = () =>
-    setValue("theme", defaultTheme, { shouldDirty: true, shouldTouch: true });
+    setValue(
+      "theme",
+      { ...defaultTheme, pageSize: getValues("theme.pageSize") ?? DEFAULT_PAGE_SIZE },
+      { shouldDirty: true, shouldTouch: true },
+    );
 
   return (
     <SectionCard
@@ -65,6 +78,25 @@ export function AppearanceSection() {
         </Button>
       }
     >
+      <div className={styles.row}>
+        <span className={styles.label}>Page size</span>
+        <Controller
+          name="theme.pageSize"
+          control={control}
+          render={({ field }) => (
+            <Segmented
+              value={field.value ?? DEFAULT_PAGE_SIZE}
+              onChange={field.onChange}
+              options={PAGE_SIZE_OPTIONS}
+              aria-label="Page size"
+            />
+          )}
+        />
+      </div>
+      <p className={styles.note}>
+        US and Canadian employers expect US Letter; most other countries use A4.
+      </p>
+
       <div className={styles.row}>
         <span className={styles.label}>Accent color</span>
         <Controller

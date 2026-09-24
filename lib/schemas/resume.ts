@@ -292,6 +292,17 @@ export const SKILLS_STYLE_LABELS: Record<SkillsStyle, string> = {
   inline: "Inline text",
 };
 
+// Paper size of the PDF. A4 is the default outside North America; US and
+// Canadian recruiters expect Letter (an A4 PDF printed on Letter gets clipped
+// or shrunk). Values are @react-pdf's own size names.
+export const PAGE_SIZES = ["A4", "LETTER"] as const;
+export type PageSize = (typeof PAGE_SIZES)[number];
+export const DEFAULT_PAGE_SIZE: PageSize = "A4";
+export const PAGE_SIZE_LABELS: Record<PageSize, string> = {
+  A4: "A4",
+  LETTER: "US Letter",
+};
+
 export const themeSchema = z.object({
   accent: z
     .string()
@@ -325,6 +336,7 @@ export const themeSchema = z.object({
     .catch(DEFAULT_SIDEBAR_COLUMN_WIDTH)
     .default(DEFAULT_SIDEBAR_COLUMN_WIDTH),
   skillsStyle: z.enum(SKILLS_STYLES).catch(DEFAULT_SKILLS_STYLE).default(DEFAULT_SKILLS_STYLE),
+  pageSize: z.enum(PAGE_SIZES).catch(DEFAULT_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
 });
 
 export type ResumeTheme = z.infer<typeof themeSchema>;
