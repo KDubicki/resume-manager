@@ -23,6 +23,12 @@ import {
   defaultTheme,
   type ResumeContent,
 } from "@/lib/schemas/resume";
+import {
+  contrastRatio,
+  darkenToContrast,
+  MIN_ACCENT_CONTRAST,
+  PAPER,
+} from "@/lib/theme/contrast";
 
 import styles from "./appearance-section.module.css";
 import { SectionCard } from "./section-card";
@@ -52,6 +58,12 @@ export function AppearanceSection() {
   const { control, getValues, setValue } = useFormContext<ResumeContent>();
   const template = useWatch({ control, name: "template" });
   const sidebarWidth = useWatch({ control, name: "theme.sidebarColumnWidth" });
+  const accent = useWatch({ control, name: "theme.accent" }) ?? DEFAULT_ACCENT;
+  // The accent is heading text on white paper: flag picks a reader (or an
+  // OCR-based parser) would struggle with, and offer the nearest color that
+  // passes, same hue, just darker.
+  const accentContrast = contrastRatio(accent, PAPER);
+  const lowContrast = accentContrast < MIN_ACCENT_CONTRAST;
 
   // Restore every appearance setting to its recommended default in one shot —
   // except the page size, which follows where the resume is sent, not taste.
@@ -118,6 +130,25 @@ export function AppearanceSection() {
         />
       </div>
       <p className={styles.note}>Tints section headings and skill chips in every template.</p>
+      {lowContrast ? (
+        <div className={styles.contrastWarning} role="status">
+          <span>
+            Low contrast on paper ({accentContrast.toFixed(1)}:1). Headings may be hard to read;
+            aim for at least {MIN_ACCENT_CONTRAST}:1.
+          </span>
+          <Button
+            size="small"
+            onClick={() =>
+              setValue("theme.accent", darkenToContrast(accent), {
+                shouldDirty: true,
+                shouldTouch: true,
+              })
+            }
+          >
+            Darken to pass
+          </Button>
+        </div>
+      ) : null}
 
       <div className={styles.row}>
         <span className={styles.label}>Font</span>

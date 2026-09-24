@@ -14,6 +14,20 @@
   color: var(--muted-ink);
 }
 
+.contrastWarning {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--error-ink);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--error-ink);
+  background: color-mix(in srgb, var(--error-ink) 8%, transparent);
+}
+
 .row + .row {
   margin-top: 16px;
 }
