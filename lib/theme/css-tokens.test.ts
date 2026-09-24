@@ -27,6 +27,14 @@ const inlineProps = new Set(
   ),
 );
 
+// Component-scoped properties a CSS module declares itself (e.g. `--stage:` in
+// status-tag.module.css); these are defined where they're used.
+const moduleProps = new Set(
+  inSourceDirs(".module.css").flatMap((file) =>
+    [...readFileSync(file, "utf8").matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]!),
+  ),
+);
+
 // Custom properties declared inside the first `{ ... }` block that follows
 // `selector` (theme blocks contain no nested braces).
 function definedIn(selector: string): Set<string> {
@@ -51,7 +59,9 @@ describe("design tokens", () => {
           [...readFileSync(file, "utf8").matchAll(/var\((--[a-z0-9-]+)/g)].map((m) => m[1]!),
         )
         // --font-* come from next/font on <html>, not from globals.css.
-        .filter((name) => !name.startsWith("--font-") && !inlineProps.has(name)),
+        .filter(
+          (name) => !name.startsWith("--font-") && !inlineProps.has(name) && !moduleProps.has(name),
+        ),
     );
     expect([...used].filter((name) => !light.has(name))).toEqual([]);
   });

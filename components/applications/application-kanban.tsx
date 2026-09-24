@@ -15,7 +15,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { App, Tag } from "antd";
+import { App } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useMemo, useState } from "react";
@@ -30,7 +30,7 @@ import {
 import { ApplicationActions } from "./application-actions";
 import styles from "./application-kanban.module.css";
 import type { ApplicationItem } from "./application-filters";
-import { STATUS_COLORS } from "./status-colors";
+import { StatusTag } from "./status-tag";
 
 function isStatus(value: string): value is ApplicationStatus {
   return (APPLICATION_STATUSES as readonly string[]).includes(value);
@@ -113,9 +113,7 @@ function KanbanColumn({
   return (
     <section className={styles.column} aria-label={APPLICATION_STATUS_LABELS[status]}>
       <header className={styles.columnHead}>
-        <Tag color={STATUS_COLORS[status]} className={styles.columnTag}>
-          {APPLICATION_STATUS_LABELS[status]}
-        </Tag>
+        <StatusTag status={status} className={styles.columnTag} />
         <span className={`font-mono ${styles.count}`}>{applications.length}</span>
       </header>
       <div ref={setNodeRef} className={styles.dropZone} data-over={isOver || undefined}>

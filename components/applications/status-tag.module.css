@@ -1,0 +1,41 @@
+/* Neutral until sent, petrol while in flight, brass for the interview (the
+   confidence accent, spent on a moment that earns it), green on an offer, a
+   quiet brick for a no. */
+.tag {
+  --stage: var(--muted-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 1px 8px;
+  border: 1px solid color-mix(in srgb, var(--stage) 45%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--stage) 12%, transparent);
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.tag[data-status="APPLIED"] {
+  --stage: var(--accent);
+}
+
+.tag[data-status="INTERVIEW"] {
+  --stage: var(--brass);
+}
+
+.tag[data-status="OFFER"] {
+  --stage: var(--success-ink);
+}
+
+.tag[data-status="REJECTED"] {
+  --stage: var(--error-ink);
+}
+
+.dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--stage);
+}

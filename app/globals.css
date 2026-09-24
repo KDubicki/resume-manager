@@ -17,6 +17,7 @@
   --accent: #0f5c57;
   --surface-subtle: #f1f3f2;
   --warn-ink: #b8862a;
+  --success-ink: #2e7d5b;
 }
 
 :root[data-theme="dark"] {
@@ -31,6 +32,7 @@
   --accent: #39a99e;
   --surface-subtle: #1e2826;
   --warn-ink: #d6a24c;
+  --success-ink: #4fb07f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,6 +48,7 @@
     --accent: #39a99e;
     --surface-subtle: #1e2826;
     --warn-ink: #d6a24c;
+    --success-ink: #4fb07f;
   }
 }
 

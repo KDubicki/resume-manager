@@ -1,6 +1,6 @@
 "use client";
 
-import { App, Select, Tag } from "antd";
+import { App, Select } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,7 +15,7 @@ import {
 import { ApplicationActions } from "./application-actions";
 import styles from "./application-card.module.css";
 import type { ApplicationItem } from "./application-filters";
-import { STATUS_COLORS } from "./status-colors";
+import { StatusTag } from "./status-tag";
 
 export function ApplicationCard({
   application,
@@ -50,9 +50,7 @@ export function ApplicationCard({
   return (
     <div className={styles.card}>
       <div className={styles.head}>
-        <Tag color={STATUS_COLORS[application.status]} className={styles.tag}>
-          {APPLICATION_STATUS_LABELS[application.status]}
-        </Tag>
+        <StatusTag status={application.status} className={styles.tag} />
         <ApplicationActions application={application} onEdit={onEdit} />
       </div>
 
