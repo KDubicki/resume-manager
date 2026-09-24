@@ -34,7 +34,10 @@ const baseStyles = StyleSheet.create({
     fontSize: 26,
     fontWeight: 700,
     textAlign: "center",
-    letterSpacing: 4,
+    // Kept light: wider tracking (it was 4) makes pdf.js-based parsers read
+    // the name as single letters ("K A M I L D U B I C K I"), and the name is
+    // the one field every ATS must get right.
+    letterSpacing: 1,
     textTransform: "uppercase",
     // letterSpacing makes @react-pdf under-measure the line box, so the
     // headline overlaps the name without an explicit lineHeight + margin.
@@ -45,7 +48,8 @@ const baseStyles = StyleSheet.create({
     fontSize: 12,
     color: MUTED,
     textAlign: "center",
-    letterSpacing: 2,
+    // Same reason as the name (it was 2).
+    letterSpacing: 0.5,
     textTransform: "uppercase",
     lineHeight: 1.3,
   },
