@@ -1,10 +1,12 @@
 "use client";
 
+import { SwapOutlined } from "@ant-design/icons";
 import { pdf } from "@react-pdf/renderer";
 import { useEffect, useRef, useState } from "react";
 
 import type { ResumeContent } from "@/lib/schemas/resume";
 
+import { AtsSheet } from "./ats-sheet";
 import { registerPdfFonts } from "./register-fonts";
 import { ResumeDocument } from "./resume-document";
 import styles from "./live-preview.module.css";
@@ -21,6 +23,10 @@ import styles from "./live-preview.module.css";
 // change can't accumulate.
 export function LivePreview({ title, content }: { title: string; content: ResumeContent }) {
   const [url, setUrl] = useState<string | null>(null);
+  // The same blob the iframe shows, kept for the ATS sheet on the back.
+  const [blob, setBlob] = useState<Blob | null>(null);
+  // Front = the paper a person reads; back = the text a parser reads.
+  const [flipped, setFlipped] = useState(false);
   const [failed, setFailed] = useState(false);
   // Track the last object URL so we can revoke it once a newer one replaces it,
   // instead of revoking eagerly (which could pull the rug from under the iframe
@@ -40,6 +46,7 @@ export function LivePreview({ title, content }: { title: string; content: Resume
         if (lastUrlRef.current) URL.revokeObjectURL(lastUrlRef.current);
         lastUrlRef.current = next;
         setUrl(next);
+        setBlob(blob);
         setFailed(false);
       } catch {
         if (!cancelled) setFailed(true);
@@ -59,22 +66,38 @@ export function LivePreview({ title, content }: { title: string; content: Resume
     [],
   );
 
-  if (failed) {
-    return (
-      <div className={styles.placeholder}>
-        <span className="font-mono">Preview failed to render.</span>
-      </div>
-    );
-  }
+  const front = failed ? (
+    <div className={styles.placeholder}>
+      <span className="font-mono">Preview failed to render.</span>
+    </div>
+  ) : url ? (
+    <iframe className={styles.viewer} title="Live resume preview" src={url} />
+  ) : (
+    // Keep showing the previous PDF (no blank flash) until the next blob is ready.
+    <div className={styles.placeholder}>
+      <span className="font-mono">Loading preview…</span>
+    </div>
+  );
 
-  // Keep showing the previous PDF (no blank flash) until the next blob is ready.
-  if (!url) {
-    return (
-      <div className={styles.placeholder}>
-        <span className="font-mono">Loading preview…</span>
+  return (
+    <div className={styles.stage}>
+      <div className={styles.card} data-flipped={flipped || undefined}>
+        <div className={styles.front} aria-hidden={flipped || undefined}>
+          {front}
+        </div>
+        <div className={styles.back} aria-hidden={!flipped || undefined}>
+          <AtsSheet blob={blob} active={flipped} />
+        </div>
       </div>
-    );
-  }
-
-  return <iframe className={styles.viewer} title="Live resume preview" src={url} />;
+      <button
+        type="button"
+        className={`font-mono ${styles.flip}`}
+        onClick={() => setFlipped((value) => !value)}
+        aria-pressed={flipped}
+      >
+        <SwapOutlined aria-hidden="true" />
+        {flipped ? "Paper" : "ATS view"}
+      </button>
+    </div>
+  );
 }

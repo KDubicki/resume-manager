@@ -17,3 +17,93 @@
   align-items: center;
   justify-content: center;
 }
+
+/* ---- the flip: paper on the front, the parser's reading on the back ---- */
+
+.stage {
+  position: relative;
+  perspective: 2200px;
+}
+
+.card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.45, 0.05, 0.25, 1);
+}
+
+.card[data-flipped] {
+  transform: rotateY(180deg);
+}
+
+.front,
+.back {
+  backface-visibility: hidden;
+  /* The PDF iframe renders out-of-process and can ignore backface-visibility,
+     so each face also switches visibility exactly at the half-turn, when the
+     card is edge-on and nothing shows either way. */
+  transition: visibility 0s linear 0.35s;
+}
+
+/* The front stays in flow and sizes the card; the back covers it. */
+.front {
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
+}
+
+.front > * {
+  flex: 1;
+}
+
+.back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  visibility: hidden;
+}
+
+.card[data-flipped] .front {
+  visibility: hidden;
+}
+
+.card[data-flipped] .back {
+  visibility: visible;
+}
+
+.flip {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid #2a3532;
+  border-radius: 999px;
+  background: #16211f;
+  color: #e7ecea;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.flip:hover,
+.flip[aria-pressed="true"] {
+  border-color: var(--brass);
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No rotation: the faces simply swap. */
+  .card,
+  .front,
+  .back {
+    transition: none;
+  }
+}

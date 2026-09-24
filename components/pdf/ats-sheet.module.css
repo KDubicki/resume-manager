@@ -1,0 +1,169 @@
+/* The machine's side of the paper. Deliberately the same in both themes: the
+   front is always paper-white, so the back is always the scanner's dark glass. */
+.sheet {
+  --glass: #0d1413;
+  --glass-ink: #b9c7c2;
+  --glass-dim: #5f706b;
+  --glass-rule: #1e2a28;
+  --glass-brass: #d6a24c;
+
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  padding: 18px 20px 24px;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 21px,
+      color-mix(in srgb, var(--glass-rule) 60%, transparent) 21px,
+      color-mix(in srgb, var(--glass-rule) 60%, transparent) 22px
+    ),
+    radial-gradient(120% 80% at 50% 0%, #15211f 0%, var(--glass) 70%);
+  /* Rules scroll with the text instead of staying painted on the frame. */
+  background-attachment: local;
+  color: var(--glass-ink);
+  font-size: 12px;
+  line-height: 22px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.header {
+  position: sticky;
+  top: -18px;
+  z-index: 1;
+  margin: -18px -20px 12px;
+  padding: 14px 20px 10px;
+  background: color-mix(in srgb, var(--glass) 92%, transparent);
+  border-bottom: 1px solid var(--glass-rule);
+  backdrop-filter: blur(4px);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #e7ecea;
+}
+
+.mark {
+  color: var(--glass-brass);
+}
+
+.stats {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--glass-dim);
+}
+
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 14px;
+}
+
+.number {
+  flex: none;
+  width: 3ch;
+  color: var(--glass-dim);
+  user-select: none;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.line[data-heading] .text {
+  color: var(--glass-brass);
+  font-weight: 600;
+}
+
+.line[data-heading] .number {
+  color: var(--glass-brass);
+}
+
+.sectionMark {
+  opacity: 0.8;
+}
+
+.pageBreak {
+  flex-basis: 100%;
+  margin: 10px 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--glass-dim);
+}
+
+.pageBreak::before,
+.pageBreak::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--glass-rule);
+}
+
+.footer {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-rule);
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--glass-dim);
+}
+
+/* A single brass scan line sweeping the sheet whenever a fresh reading lands. */
+.scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--glass-brass) 16%, transparent) 85%,
+    var(--glass-brass) 100%
+  );
+  opacity: 0;
+  animation: scan 1.1s cubic-bezier(0.4, 0, 0.2, 1) 0.15s 1;
+}
+
+/* `top` (not translateY): its percentage is of the sheet, not of the beam. */
+@keyframes scan {
+  0% {
+    opacity: 0;
+    top: -60px;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    top: calc(100% - 60px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan {
+    display: none;
+  }
+}
